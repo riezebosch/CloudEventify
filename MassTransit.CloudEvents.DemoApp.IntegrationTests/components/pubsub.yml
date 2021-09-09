@@ -1,0 +1,27 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: my-pubsub
+  namespace: default
+spec:
+  type: pubsub.rabbitmq
+  version: v1
+  metadata:
+    - name: host
+      value: "amqp://localhost:5672"
+    - name: durable
+      value: "false"
+    - name: deletedWhenUnused
+      value: "false"
+    - name: autoAck
+      value: "false"
+    - name: deliveryMode
+      value: "0"
+    - name: requeueInFailure
+      value: "false"
+    - name: prefetchCount
+      value: "0"
+    - name: reconnectWait
+      value: "0"
+    - name: concurrencyMode
+      value: parallel

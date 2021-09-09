@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Dapr.Client" Version="1.3.0" />
+        <PackageReference Include="FluentAssertions" Version="6.1.0" />
+        <PackageReference Include="Hypothesist" Version="2.0.12" />
+        <PackageReference Include="MassTransit.RabbitMQ" Version="7.2.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.9" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
+        <PackageReference Include="NSubstitute" Version="4.2.2" />
+        <PackageReference Include="Wrapr" Version="1.0.16" />
+        <PackageReference Include="xunit" Version="2.4.1" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="coverlet.collector" Version="3.0.2">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\MassTransit.CloudEvents.DemoApp\MassTransit.CloudEvents.DemoApp.csproj" />
+      <ProjectReference Include="..\MassTransit.CloudEvents\MassTransit.CloudEvents.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="components\**">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+</Project>

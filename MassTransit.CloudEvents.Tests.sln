@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.CloudEvents.Tests", "MassTransit.CloudEvents.Tests\MassTransit.CloudEvents.Tests.csproj", "{0B86FD16-2A60-4F31-8682-3A9539F10323}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.CloudEvents", "MassTransit.CloudEvents\MassTransit.CloudEvents.csproj", "{5DDA7642-DF55-4D9D-829D-85EE744BB6C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.CloudEvents.IntegrationTests", "MassTransit.CloudEvents.IntegrationTests\MassTransit.CloudEvents.IntegrationTests.csproj", "{426EC264-6DF2-4187-AA12-C8965634E462}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.CloudEvents.DemoApp", "MassTransit.CloudEvents.DemoApp\MassTransit.CloudEvents.DemoApp.csproj", "{6EBF260C-D04E-48D5-99F9-5790817F5595}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.CloudEvents.DemoApp.IntegrationTests", "MassTransit.CloudEvents.DemoApp.IntegrationTests\MassTransit.CloudEvents.DemoApp.IntegrationTests.csproj", "{976A9E50-ACDA-4738-8D76-352462875F26}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0B86FD16-2A60-4F31-8682-3A9539F10323}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B86FD16-2A60-4F31-8682-3A9539F10323}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B86FD16-2A60-4F31-8682-3A9539F10323}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B86FD16-2A60-4F31-8682-3A9539F10323}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DDA7642-DF55-4D9D-829D-85EE744BB6C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DDA7642-DF55-4D9D-829D-85EE744BB6C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DDA7642-DF55-4D9D-829D-85EE744BB6C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DDA7642-DF55-4D9D-829D-85EE744BB6C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{426EC264-6DF2-4187-AA12-C8965634E462}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{426EC264-6DF2-4187-AA12-C8965634E462}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{426EC264-6DF2-4187-AA12-C8965634E462}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{426EC264-6DF2-4187-AA12-C8965634E462}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EBF260C-D04E-48D5-99F9-5790817F5595}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EBF260C-D04E-48D5-99F9-5790817F5595}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EBF260C-D04E-48D5-99F9-5790817F5595}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EBF260C-D04E-48D5-99F9-5790817F5595}.Release|Any CPU.Build.0 = Release|Any CPU
+		{976A9E50-ACDA-4738-8D76-352462875F26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{976A9E50-ACDA-4738-8D76-352462875F26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{976A9E50-ACDA-4738-8D76-352462875F26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{976A9E50-ACDA-4738-8D76-352462875F26}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
