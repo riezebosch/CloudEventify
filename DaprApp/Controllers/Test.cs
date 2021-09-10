@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using Dapr;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MassTransit.CloudEvents.DemoApp.Controllers
+namespace DaprApp.Controllers
 {
     [ApiController]
     [Route("[controller]")]

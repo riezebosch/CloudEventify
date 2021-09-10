@@ -6,3 +6,5 @@ riderModule.iml
 .idea/
 .DS_Store/
 *.user
+StrykerOutput/
+reports/

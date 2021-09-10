@@ -26,7 +26,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\MassTransit.CloudEvents.DemoApp\MassTransit.CloudEvents.DemoApp.csproj" />
+      <ProjectReference Include="..\DaprApp\DaprApp.csproj" />
       <ProjectReference Include="..\MassTransit.CloudEvents\MassTransit.CloudEvents.csproj" />
     </ItemGroup>
 

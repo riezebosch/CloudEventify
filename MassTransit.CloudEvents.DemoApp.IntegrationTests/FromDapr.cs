@@ -1,8 +1,9 @@
 using System.Threading.Tasks;
 using Dapr.Client;
+using DaprApp;
 using FluentAssertions.Extensions;
 using Hypothesist;
-using MassTransit.CloudEvents.DemoApp.Controllers;
+using DaprApp.Controllers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

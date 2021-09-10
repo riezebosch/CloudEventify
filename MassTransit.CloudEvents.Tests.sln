@@ -6,9 +6,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.CloudEvents", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.CloudEvents.IntegrationTests", "MassTransit.CloudEvents.IntegrationTests\MassTransit.CloudEvents.IntegrationTests.csproj", "{426EC264-6DF2-4187-AA12-C8965634E462}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.CloudEvents.DemoApp", "MassTransit.CloudEvents.DemoApp\MassTransit.CloudEvents.DemoApp.csproj", "{6EBF260C-D04E-48D5-99F9-5790817F5595}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaprApp", "DaprApp\DaprApp.csproj", "{6EBF260C-D04E-48D5-99F9-5790817F5595}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.CloudEvents.DemoApp.IntegrationTests", "MassTransit.CloudEvents.DemoApp.IntegrationTests\MassTransit.CloudEvents.DemoApp.IntegrationTests.csproj", "{976A9E50-ACDA-4738-8D76-352462875F26}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_", "_", "{DA290D4E-0476-4953-87C0-B30F8C62A263}"
+ProjectSection(SolutionItems) = preProject
+	appveyor.yml = appveyor.yml
+	.gitignore = .gitignore
+EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace MassTransit.CloudEvents.DemoApp
+namespace DaprApp
 {
     public class Program
     {

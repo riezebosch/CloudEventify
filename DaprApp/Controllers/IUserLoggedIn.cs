@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace MassTransit.CloudEvents.DemoApp.Controllers
+namespace DaprApp.Controllers
 {
     public interface IUserLoggedIn
     {
