@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Bogus;
 using FluentAssertions.Extensions;
 using Hypothesist;
 using DaprApp;
@@ -8,13 +9,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
 using Wrapr;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace MassTransit.CloudEvents.IntegrationTests
 {
+    [Collection("user/loggedIn")]
     public class ToDapr
     {
         private readonly ITestOutputHelper _output;
@@ -25,18 +26,24 @@ namespace MassTransit.CloudEvents.IntegrationTests
         [Fact]
         public async Task Do()
         {
+            // Arrange
+            var message = new Faker<UserLoggedIn>().CustomInstantiator(f => new UserLoggedIn(f.Random.Number())).Generate();
             var hypothesis = Hypothesis
                 .For<int>()
-                .Any(x => x == 1234);
+                .Any(x => x == message.UserId);
 
             using var logger = _output.BuildLogger();
-            using var host = await Host(hypothesis);
+            using var host = await Host(hypothesis.ToHandler());
             await using var sidecar = await Sidecar(logger);
-            await Publish(logger);
+            
+            // Act
+            await Publish(message, logger);
 
+            // Assert
             await hypothesis.Validate(10.Seconds());
         }
-
+        
+        
         private static async Task<Sidecar> Sidecar(ILogger logger)
         {
             var sidecar = new Sidecar("to-dapr", logger);
@@ -47,13 +54,8 @@ namespace MassTransit.CloudEvents.IntegrationTests
             return sidecar;
         }
 
-        private async Task<Microsoft.Extensions.Hosting.IHost> Host(IHypothesis<int> hypothesis)
+        private async Task<Microsoft.Extensions.Hosting.IHost> Host(IHandler<int> handler)
         {
-            var handler = Substitute.For<IUserLoggedIn>();
-            handler
-                .When(x => x.Handle(Arg.Any<int>()))
-                .Do(x => hypothesis.Test(x.Arg<int>()));
-
             var host = new HostBuilder().ConfigureWebHost(app => app
                     .UseStartup<Startup>()
                     .ConfigureLogging(builder => builder.AddXunit(_output))
@@ -64,28 +66,30 @@ namespace MassTransit.CloudEvents.IntegrationTests
             return host;
         }
 
-        private static async Task Publish(ILogger logger)
+        private static async Task Publish(UserLoggedIn message, ILogger logger)
         {
             LogContext.ConfigureCurrentLogContext(logger);
             
             var bus = Bus.Factory
                 .CreateUsingRabbitMq(cfg =>
                 {
-                    cfg.UseCloudEvents();
-                    cfg.Message<UserLoggedIn>(x =>
-                    {
-                        x.SetEntityName("user/loggedIn");
-                    });
+                    cfg.UseCloudEvents()
+                        .Type<UserLoggedIn>("loggedIn");
+                    
+                    // set the topic/exchange
+                    cfg.Message<UserLoggedIn>(x => 
+                        x.SetEntityName("user/loggedIn"));
 
+                    // if you don't want MassTransit to create the exchange
                     cfg.PublishTopology.GetMessageTopology<UserLoggedIn>().Exclude = true;
                 });
 
             await bus.StartAsync();
             
             var endpoint = await bus.GetPublishSendEndpoint<UserLoggedIn>();
-            await endpoint.Send(new UserLoggedIn(1234));
+            await endpoint.Send(message);
         }
 
-        private record UserLoggedIn(int UserId);
+        public record UserLoggedIn(int UserId);
     }
 }

@@ -1,20 +1,27 @@
-using System.Net.Mime;
-
 namespace MassTransit.CloudEvents
 {
     public static class ConfiguratorExtensions
     {
-        public static void UseCloudEvents(this IBusFactoryConfigurator cfg) =>
-            cfg.UseCloudEventsFor(new ContentType("application/cloudevents+json"));
-        
-        public static void UseCloudEventsFor(this IBusFactoryConfigurator cfg, params ContentType[] contentTypes)
+        public static IConfigurator UseCloudEvents(this IBusFactoryConfigurator cfg)
         {
-            foreach (var contentType in contentTypes)
-            {
-                cfg.AddMessageDeserializer(contentType, () => new CloudEventsDeserializer { ContentType = contentType });    
-            }
+            var deserializer = new Deserializer();
+            cfg.AddMessageDeserializer(deserializer.ContentType, () => deserializer);
 
-            cfg.SetMessageSerializer(() => new CloudEventsSerializer());
+            var serializer = new Serializer();
+            cfg.SetMessageSerializer(() => serializer);
+
+            return new Configurator(serializer, deserializer);
+        }
+
+        public static IConfigurator UseCloudEvents(this IReceiveEndpointConfigurator cfg)
+        {
+            var deserializer = new Deserializer();
+            cfg.AddMessageDeserializer(deserializer.ContentType, () => deserializer);
+
+            var serializer = new Serializer();
+            cfg.SetMessageSerializer(() => serializer);
+
+            return new Configurator(serializer, deserializer);
         }
     }
 }

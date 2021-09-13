@@ -6,13 +6,13 @@
 
     <ItemGroup>
       <PackageReference Include="CloudNative.CloudEvents.SystemTextJson" Version="2.1.1" />
-      <PackageReference Include="Divergic.Logging.Xunit" Version="3.6.0" />
-      <PackageReference Include="MassTransit" Version="7.2.2" />
+      <PackageReference Include="MassTransit" Version="[7.2.2,8)" />
     </ItemGroup>
 
     <PropertyGroup>
         <Authors>Manuel Riezebosch</Authors>
         <NeutralLanguage>en-US</NeutralLanguage>
+        <PackageId>CloudEventify.MassTransit</PackageId>
         <Description>Use cloud events for pub/sub with MassTransit.</Description>
         <PackageReleaseNotes>1st</PackageReleaseNotes>
         <PackageTags>cloudevents;cloud;events;masstransit</PackageTags>

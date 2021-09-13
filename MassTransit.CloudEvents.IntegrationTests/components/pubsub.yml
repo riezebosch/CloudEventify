@@ -14,7 +14,7 @@ spec:
     - name: deletedWhenUnused
       value: "false"
     - name: autoAck
-      value: "false"
+      value: "true"
     - name: deliveryMode
       value: "0"
     - name: requeueInFailure

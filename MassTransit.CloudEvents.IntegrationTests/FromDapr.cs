@@ -1,17 +1,18 @@
 using System.Net.Mime;
 using System.Threading.Tasks;
+using Bogus;
 using Dapr.Client;
 using FluentAssertions.Extensions;
 using Hypothesist;
 using MassTransit.Context;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
 using Wrapr;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace MassTransit.CloudEvents.IntegrationTests
 {
+    [Collection("user/loggedIn")]
     public class FromDapr
     {
         private readonly ITestOutputHelper _output;
@@ -22,42 +23,73 @@ namespace MassTransit.CloudEvents.IntegrationTests
         [Fact]
         public async Task Do()
         {
+            // Arrange
+            var message = Message();
             var hypothesis = Hypothesis
                 .For<UserLoggedIn>()
-                .Any(x => x == new UserLoggedIn("1234"));
+                .Any(x => x == message);
 
             using var logger = _output.BuildLogger();
-            await Host(hypothesis, logger);
-            await Publish(logger);
-
-            await hypothesis.Validate(15.Seconds());
-        }
-
-        private static async Task Host(IHypothesis<UserLoggedIn> hypothesis, ILogger logger)
-        {
-            var consumer = Substitute.For<IConsumer<UserLoggedIn>>();
-            consumer
-                .When(x => x.Consume(Arg.Any<ConsumeContext<UserLoggedIn>>()))
-                .Do(x => hypothesis.Test(x.Arg<ConsumeContext<UserLoggedIn>>().Message));
-
             LogContext.ConfigureCurrentLogContext(logger);
+            
             var bus = Bus.Factory
                 .CreateUsingRabbitMq(cfg =>
                 {
-                    cfg.UseCloudEventsFor(new ContentType("text/plain"), new ContentType("application/cloudevents+json"));
+                    cfg.UseCloudEvents()
+                        .WithContentType(new ContentType("text/plain"));
+                    
                     cfg.ReceiveEndpoint("user:loggedIn:test", e =>
                     {
-                        e.Consumer(() => consumer);
+                        e.Consumer(hypothesis.ToConsumer);
                         e.Bind("user/loggedIn");
                     });
-
+                    
                     cfg.Message<UserLoggedIn>(x => x.SetEntityName("user/loggedIn"));
                 });
 
             await bus.StartAsync();
+            
+            // Act
+            await Publish(message, logger);
+
+            // Assert
+            await hypothesis.Validate(15.Seconds());
         }
 
-        private static async Task Publish(ILogger logger)
+        [Fact]
+        public async Task ReceiveEndpointConfiguration()
+        {
+            // Arrange
+            var message = Message();
+            var hypothesis = Hypothesis
+                .For<UserLoggedIn>()
+                .Any(x => x == message);
+
+            using var logger = _output.BuildLogger();
+            LogContext.ConfigureCurrentLogContext(logger);
+            
+            var bus = Bus.Factory
+                .CreateUsingRabbitMq(cfg =>
+                {
+                    cfg.ReceiveEndpoint("user:loggedIn:test:local-config", x =>
+                    {
+                        x.UseCloudEvents()
+                            .WithContentType(new ContentType("text/plain"));
+                        x.Consumer(hypothesis.ToConsumer);
+                        x.Bind("user/loggedIn");
+                    });
+                });
+            await bus.StartAsync();
+
+            // Act
+            await Publish(message, logger);
+
+            // Assert
+            await hypothesis.Validate(10.Seconds());
+        }
+
+
+        private static async Task Publish(UserLoggedIn message, ILogger logger)
         {
             await using var sidecar = new Sidecar("from-dapr", logger);
             await sidecar.Start(with => with
@@ -68,9 +100,14 @@ namespace MassTransit.CloudEvents.IntegrationTests
                 .UseGrpcEndpoint("http://localhost:3001")
                 .Build();
 
-            await client.PublishEventAsync("my-pubsub", "user/loggedIn", new { id = "1234" });
+            await client.PublishEventAsync("my-pubsub", "user/loggedIn", message);
         }
 
         public record UserLoggedIn(string Id);
+        
+        private static UserLoggedIn Message() => 
+            new Faker<UserLoggedIn>()
+                .CustomInstantiator(f => new UserLoggedIn(f.Random.Hash()))
+                .Generate();
     }
 }

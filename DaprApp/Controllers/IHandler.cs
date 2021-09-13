@@ -2,8 +2,8 @@ using System.Threading.Tasks;
 
 namespace DaprApp.Controllers
 {
-    public interface IUserLoggedIn
+    public interface IHandler<in T>
     {
-        Task Handle(int id);
+        Task Handle(T data);
     }
 }

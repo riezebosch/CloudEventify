@@ -6,13 +6,13 @@ namespace DaprApp.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class Test : ControllerBase
+    public class UserController : ControllerBase
     {
         [HttpPost]
         [Topic("my-pubsub", "user/loggedIn")]
-        public async Task PostAsync(Data data, [FromServices]IUserLoggedIn handler) => 
-            await handler.Handle(data.UserId);
+        public async Task LoggedIn(Message message, [FromServices]IHandler<int> handler) => 
+            await handler.Handle(message.UserId);
         
-        public record Data(int UserId);
+        public record Message(int UserId);
     }
 }

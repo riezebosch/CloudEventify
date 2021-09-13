@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using Dapr.Client;
-using DaprApp;
 using FluentAssertions.Extensions;
 using Hypothesist;
 using DaprApp.Controllers;
@@ -8,22 +7,21 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
 using Wrapr;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace MassTransit.CloudEvents.DemoApp.IntegrationTests
+namespace DaprApp.IntegrationTests
 {
-    public class FromDapr
+    public class UserControllerTests
     {
         private readonly ITestOutputHelper _output;
 
-        public FromDapr(ITestOutputHelper output) => 
+        public UserControllerTests(ITestOutputHelper output) => 
             _output = output;
 
         [Fact]
-        public async Task Do()
+        public async Task TestPublish()
         {
             var hypothesis = Hypothesis
                 .For<int>()
@@ -50,19 +48,25 @@ namespace MassTransit.CloudEvents.DemoApp.IntegrationTests
 
         private async Task<IHost> Host(IHypothesis<int> hypothesis)
         {
-            var handler = Substitute.For<IUserLoggedIn>();
-            handler
-                .When(x => x.Handle(Arg.Any<int>()))
-                .Do(x => hypothesis.Test(x.Arg<int>()));
-
             var host = new HostBuilder().ConfigureWebHost(app => app
                     .UseStartup<Startup>()
                     .ConfigureLogging(builder => builder.AddXunit(_output))
-                    .ConfigureServices(services => services.AddSingleton(handler))
+                    .ConfigureServices(services => services.AddSingleton<IHandler<int>>(new TestHandler<int>(hypothesis)))
                     .UseKestrel(options => options.ListenLocalhost(6002)))
                 .Build();
             await host.StartAsync();
             return host;
+        }
+
+        private class TestHandler<T> : IHandler<T>
+        {
+            private readonly IHypothesis<T> _hypothesis;
+
+            public TestHandler(IHypothesis<T> hypothesis) => 
+                _hypothesis = hypothesis;
+
+            public Task Handle(T id) =>
+                _hypothesis.Test(id);
         }
 
         private static async Task Publish()

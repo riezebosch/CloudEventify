@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.CloudEvents.Int
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaprApp", "DaprApp\DaprApp.csproj", "{6EBF260C-D04E-48D5-99F9-5790817F5595}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.CloudEvents.DemoApp.IntegrationTests", "MassTransit.CloudEvents.DemoApp.IntegrationTests\MassTransit.CloudEvents.DemoApp.IntegrationTests.csproj", "{976A9E50-ACDA-4738-8D76-352462875F26}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaprApp.IntegrationTests", "DaprApp.IntegrationTests\DaprApp.IntegrationTests.csproj", "{976A9E50-ACDA-4738-8D76-352462875F26}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_", "_", "{DA290D4E-0476-4953-87C0-B30F8C62A263}"
 ProjectSection(SolutionItems) = preProject

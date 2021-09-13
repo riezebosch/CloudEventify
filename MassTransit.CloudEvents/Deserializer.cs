@@ -9,8 +9,10 @@ using MassTransit.Context;
 
 namespace MassTransit.CloudEvents
 {
-    public class CloudEventsDeserializer : IMessageDeserializer
+    public class Deserializer : IMessageDeserializer
     {
+        private readonly Dictionary<string, Type> _types = new ();
+
         void IProbeSite.Probe(ProbeContext context)
         {
         }
@@ -20,23 +22,48 @@ namespace MassTransit.CloudEvents
             var formatter = new JsonEventFormatter();
             var message = formatter.DecodeStructuredModeMessage((ReadOnlyMemory<byte>)receiveContext.GetBody(), null, null);
 
-            return new CloudEventContext(receiveContext, message);
+            return new CloudEventContext(receiveContext, message, _types);
         }
+
+        public ContentType ContentType
+        {
+            get;
+            set; 
+        } = new ("application/cloudevents+json");
+
+       
+        public void AddType<T>(string type) => 
+            _types[type] = typeof(T);
 
         private class CloudEventContext : DeserializerConsumeContext
         {
             private readonly CloudEvent _cloudEvent;
+            private readonly Dictionary<string, Type> _mappings;
+            private readonly JsonSerializerOptions _options = new() { PropertyNameCaseInsensitive = true };
 
-            public CloudEventContext(ReceiveContext receiveContext, CloudEvent cloudEvent) : base(receiveContext) =>
+            public CloudEventContext(ReceiveContext receiveContext, CloudEvent cloudEvent, Dictionary<string, Type> mappings) 
+                : base(receiveContext)
+            {
                 _cloudEvent = cloudEvent;
+                _mappings = mappings;
+            }
 
             public override bool HasMessageType(Type messageType) =>
                 true;
 
             public override bool TryGetMessage<T>(out ConsumeContext<T> consumeContext)
             {
-                consumeContext = new MessageConsumeContext<T>(this, ((JsonElement)_cloudEvent.Data).ToObject<T>(new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
-                return true;
+                try
+                {
+                    var message = _cloudEvent.ToObject<T>(Type<T>(), _options);
+                    consumeContext = new MessageConsumeContext<T>(this, message);
+                    return true;
+                }
+                catch (NotSupportedException)
+                {
+                    consumeContext = null;
+                    return false;
+                }
             }
 
             public override Guid? MessageId => Guid.TryParse(_cloudEvent.Id, out var result) ? result : null;
@@ -53,12 +80,9 @@ namespace MassTransit.CloudEvents
             public override Headers Headers { get; }
             public override HostInfo Host { get; }
             public override IEnumerable<string> SupportedMessageTypes { get; }
-        }
 
-        public ContentType ContentType
-        {
-            get;
-            set; 
-        } = new ("text/plain");
+            private Type Type<T>() => 
+                _mappings.TryGetValue(_cloudEvent.Type!, out var result) ? result : typeof(T);
+        }
     }
 }
