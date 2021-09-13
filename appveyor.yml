@@ -5,7 +5,7 @@ image: Ubuntu2004
 configuration: Release
 only_commits:
   files:
-    - ./MassTransit.CloudEvents/**/*
+    - MassTransit.CloudEvents/**/*
 dotnet_csproj:
   patch: true
   file: '**\*.csproj'
