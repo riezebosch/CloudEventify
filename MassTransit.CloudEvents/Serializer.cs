@@ -15,7 +15,7 @@ namespace MassTransit.CloudEvents
             var cloudEvent = new CloudEvent(CloudEventsSpecVersion.Default)
             {
                 Data = context.Message,
-                Source = context.SourceAddress,
+                Source = context.SourceAddress ?? new Uri("cloudeventify:masstransit"),
                 Id = context.MessageId.ToString(),
                 Type = Type(context.Message.GetType())
             };
