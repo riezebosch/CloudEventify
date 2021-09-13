@@ -40,7 +40,7 @@ namespace MassTransit.CloudEvents.IntegrationTests
                     
                     cfg.ReceiveEndpoint("user:loggedIn:test", e =>
                     {
-                        e.Consumer(hypothesis.ToConsumer);
+                        e.Consumer(hypothesis.AsConsumer);
                         e.Bind("user/loggedIn");
                     });
                     
@@ -75,7 +75,7 @@ namespace MassTransit.CloudEvents.IntegrationTests
                     {
                         x.UseCloudEvents()
                             .WithContentType(new ContentType("text/plain"));
-                        x.Consumer(hypothesis.ToConsumer);
+                        x.Consumer(hypothesis.AsConsumer);
                         x.Bind("user/loggedIn");
                     });
                 });
