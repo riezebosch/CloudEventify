@@ -1,4 +1,8 @@
-# MassTransit CloudEvents
+# MassTransit+CloudEvents
+
+[![nuget](https://img.shields.io/nuget/v/CloudEventify.MassTransit.svg)](https://www.nuget.org/packages/CloudEventify.MassTransit/)
+[![codecov](https://codecov.io/gh/riezebosch/MassTransit.CloudEvents/branch/main/graph/badge.svg)](https://codecov.io/gh/riezebosch/MassTransit.CloudEvents)
+[![build status](https://ci.appveyor.com/api/projects/status/a03ol21xakxbf477/branch/main?svg=true)](https://ci.appveyor.com/project/riezebosch/masstransit-cloudevents)
 
 ## TL;DR
 
@@ -38,7 +42,7 @@ cfg.UseCloudEvents()
 ```
 
 Sets the content-type for both the serializer _and_ the deserializer.
-For example when the publishing side chooses a different content type.
+For example when the publishing side chooses [a different content type](https://github.com/dapr/components-contrib/blob/master/bindings/rabbitmq/rabbitmq.go#L98).
 
 You can invoke the `UseCloudEvents` with a different `ContentType` multiple times
 but the last one wins for the outbound (serializer) configuration.
