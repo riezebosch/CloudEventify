@@ -18,8 +18,13 @@
         <PackageReleaseNotes>1st</PackageReleaseNotes>
         <PackageTags>cloudevents;cloud;events;masstransit</PackageTags>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/riezebosch/MassTransit.CloudEvents.git</RepositoryUrl>
         <Version>0.0.1</Version>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\README.md" Pack="true" PackagePath="" />
+    </ItemGroup>
 </Project>

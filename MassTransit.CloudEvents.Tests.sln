@@ -14,6 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_", "_", "{DA290D4E-0476-49
 ProjectSection(SolutionItems) = preProject
 	appveyor.yml = appveyor.yml
 	.gitignore = .gitignore
+	README.md = README.md
 EndProjectSection
 EndProject
 Global
