@@ -17,10 +17,17 @@ namespace MassTransit.CloudEvents
                 Data = context.Message,
                 Source = context.SourceAddress ?? new Uri("cloudeventify:masstransit"),
                 Id = context.MessageId.ToString(),
-                Type = Type(context.Message.GetType())
+                Type = Type(context.Message.GetType()),
+                Time = GetTimeValue?.Invoke()
             };
 
             stream.Write(cloudEvent.ToMessage().Span);
+        }
+
+        private Func<DateTimeOffset?> GetTimeValue;
+        public void ConfigureTimeAttribute(Func<DateTimeOffset?> getTime)
+        {
+            GetTimeValue = getTime;
         }
 
         public ContentType ContentType

@@ -1,3 +1,4 @@
+using System;
 using System.Net.Mime;
 
 namespace MassTransit.CloudEvents
@@ -26,6 +27,12 @@ namespace MassTransit.CloudEvents
             _deserializer.AddType<T>(type);
             _serializer.AddType<T>(type);
             
+            return this;
+        }
+
+        public IConfigurator WithTimeAttributeValueOnSerialize(Func<DateTimeOffset?> getTime)
+        {
+            _serializer.ConfigureTimeAttribute(getTime);
             return this;
         }
     }

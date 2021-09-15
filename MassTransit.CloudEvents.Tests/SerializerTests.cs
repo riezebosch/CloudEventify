@@ -79,6 +79,56 @@ namespace MassTransit.CloudEvents.Tests
                 .Be(source);
         }
 
+        [Fact]
+        public void NoTimeByDefault()
+        {
+            // Arrange
+            var serializer = new Serializer();
+            serializer.AddType<UserRegisteredEvent>("registered");
+
+            var message = new Faker<UserRegisteredEvent>()
+                .StrictMode(true)
+                .Generate();
+
+            // Act
+            using var stream = new MemoryStream();
+            var source = new Uri("https://github.com/cloudevents");
+            serializer.Serialize(stream, new MessageSendContext<UserRegisteredEvent>(message) { SourceAddress = source });
+
+            // Assert
+            JsonSerializer
+                .Deserialize<CloudEvent>(stream.ToArray(), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })!
+                .Time
+                .Should()
+                .BeNull();
+        }
+
+        [Fact]
+        public void SetTime()
+        {
+            // Arrange
+            var currentTime = DateTimeOffset.Now;
+            var serializer = new Serializer();
+            serializer.AddType<UserRegisteredEvent>("registered");
+            serializer.ConfigureTimeAttribute(() => currentTime);
+
+            var message = new Faker<UserRegisteredEvent>()
+                .StrictMode(true)
+                .Generate();
+
+            // Act
+            using var stream = new MemoryStream();
+            var source = new Uri("https://github.com/cloudevents");
+            serializer.Serialize(stream, new MessageSendContext<UserRegisteredEvent>(message) { SourceAddress = source });
+
+            // Assert
+            JsonSerializer
+                .Deserialize<CloudEvent>(stream.ToArray(), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })!
+                .Time
+                .Should()
+                .Be(currentTime);
+        }
+
         private record UserRegisteredEvent;
     }
 }
