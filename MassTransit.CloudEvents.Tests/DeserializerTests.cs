@@ -158,6 +158,47 @@ namespace MassTransit.CloudEvents.Tests
                 .BeFalse();
         }
 
+        [Fact]
+        public void UseSentTimeFromCloudEventTime()
+        {
+            var cloudEvent = new CloudEvent(CloudEventsSpecVersion.Default)
+            {
+                Data = "hello",
+                Source = new Uri("https://google.nl"),
+                Id = Guid.NewGuid().ToString(),
+                Type = "my-custom-event",
+                Time = DateTimeOffset.Now
+            };
+
+            using var context = ReceiveContext(cloudEvent.ToMessage());
+
+            var serializer = new Deserializer().As<IMessageDeserializer>();
+            serializer.Deserialize(context)
+                .SentTime
+                .Should()
+                .Be(cloudEvent.Time.Value.DateTime);
+        }
+
+        [Fact]
+        public void CloudEventTimeMayBeNull()
+        {
+            var cloudEvent = new CloudEvent(CloudEventsSpecVersion.Default)
+            {
+                Data = "hello",
+                Source = new Uri("https://google.nl"),
+                Id = Guid.NewGuid().ToString(),
+                Type = "my-custom-event"
+            };
+
+            using var context = ReceiveContext(cloudEvent.ToMessage());
+
+            var serializer = new Deserializer().As<IMessageDeserializer>();
+            serializer.Deserialize(context)
+                .SentTime
+                .Should()
+                .BeNull();
+        }
+
         private interface IEvent
         {
             int Id { get; }

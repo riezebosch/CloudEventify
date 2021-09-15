@@ -76,7 +76,7 @@ namespace MassTransit.CloudEvents
             public override Uri DestinationAddress { get; }
             public override Uri ResponseAddress { get; }
             public override Uri FaultAddress { get; }
-            public override DateTime? SentTime { get; }
+            public override DateTime? SentTime => _cloudEvent.Time?.LocalDateTime;
             public override Headers Headers { get; }
             public override HostInfo Host { get; }
             public override IEnumerable<string> SupportedMessageTypes { get; }
