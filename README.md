@@ -2,6 +2,7 @@
 
 [![nuget](https://img.shields.io/nuget/v/CloudEventify.MassTransit.svg)](https://www.nuget.org/packages/CloudEventify.MassTransit/)
 [![codecov](https://codecov.io/gh/riezebosch/MassTransit.CloudEvents/branch/main/graph/badge.svg)](https://codecov.io/gh/riezebosch/MassTransit.CloudEvents)
+[![stryker](https://img.shields.io/endpoint?style=flat&label=stryker&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Friezebosch%2FMassTransit.CloudEvents%2Fmain)](https://dashboard.stryker-mutator.io/reports/github.com/riezebosch/MassTransit.CloudEvents/main)
 [![build status](https://ci.appveyor.com/api/projects/status/a03ol21xakxbf477/branch/main?svg=true)](https://ci.appveyor.com/project/riezebosch/masstransit-cloudevents)
 
 ## TL;DR

@@ -6,6 +6,7 @@ configuration: Release
 only_commits:
   files:
     - MassTransit.CloudEvents/**/*
+    - appveyor.yml
 dotnet_csproj:
   patch: true
   file: '**\*.csproj'
@@ -23,7 +24,7 @@ before_test:
   - dapr init
   - docker run -d --hostname my-rabbit --name some-rabbit -p 5672:5672 rabbitmq:alpine
 after_test:
-  - dotnet tool restore && cd MassTransit.CloudEvents.IntegrationTests && dotnet dotnet-stryker --project-file=MassTransit.CloudEvents.csproj
+  - dotnet tool restore && cd MassTransit.CloudEvents.Tests && dotnet stryker -r "['cleartext']"
 test_script:
   - dotnet test --collect:"XPlat Code Coverage"
 environment:
@@ -41,7 +42,7 @@ for:
         secure: hjq8RYRkP5jADqnQGO67HK3reNedik0E/M7x67bvWfOmnljS9kIiqiAgvCbn4xL6
     after_test:
       - bash <(curl -s https://codecov.io/bash)
-      - dotnet tool restore && cd MassTransit.CloudEvents.IntegrationTests && dotnet dotnet-stryker --project-file=MassTransit.CloudEvents.csproj --reporters "['dashboard']" --dashboard-api-key $STRYKER_DASHBOARD_API_KEY --dashboard-project github.com/riezebosch/Dapr.Wrapr/main
+      - dotnet tool restore && cd MassTransit.CloudEvents.Tests && dotnet stryker -r "['dashboard']" --dashboard-api-key $STRYKER_DASHBOARD_API_KEY --dashboard-project github.com/riezebosch/MassTransit.CloudEvents/main
     deploy:
       - provider: NuGet
         api_key:
