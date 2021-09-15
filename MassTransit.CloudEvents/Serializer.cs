@@ -17,7 +17,8 @@ namespace MassTransit.CloudEvents
                 Data = context.Message,
                 Source = context.SourceAddress ?? new Uri("cloudeventify:masstransit"),
                 Id = context.MessageId.ToString(),
-                Type = Type(context.Message.GetType())
+                Type = Type(context.Message.GetType()),
+                Time = context.SentTime
             };
 
             stream.Write(cloudEvent.ToMessage().Span);
