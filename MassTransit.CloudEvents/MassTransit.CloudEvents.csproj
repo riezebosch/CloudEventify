@@ -15,7 +15,7 @@
         <NeutralLanguage>en-US</NeutralLanguage>
         <PackageId>CloudEventify.MassTransit</PackageId>
         <Description>Use cloud events for pub/sub with MassTransit.</Description>
-        <PackageReleaseNotes>1st</PackageReleaseNotes>
+        <PackageReleaseNotes>WithJsonOptions</PackageReleaseNotes>
         <PackageTags>cloudevents;cloud;events;masstransit</PackageTags>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <PackageReadmeFile>README.md</PackageReadmeFile>

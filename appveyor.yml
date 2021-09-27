@@ -1,4 +1,4 @@
-version: 1.0.{build}
+version: 1.2.{build}
 pull_requests:
   do_not_increment_build_number: true
 image: Ubuntu2004
@@ -21,7 +21,7 @@ build:
 before_test:
   - docker login -u mriezebosch -p $DOCKER_TOKEN
   - sudo wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O - | /bin/bash
-  - dapr init
+  - dapr init --slim
   - docker run -d --hostname my-rabbit --name some-rabbit -p 5672:5672 rabbitmq:alpine
 after_test:
   - dotnet tool restore && cd MassTransit.CloudEvents.Tests && dotnet stryker -r "['cleartext']"

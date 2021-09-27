@@ -22,7 +22,7 @@ namespace MassTransit.CloudEvents
             var formatter = new JsonEventFormatter();
             var message = formatter.DecodeStructuredModeMessage((ReadOnlyMemory<byte>)receiveContext.GetBody(), null, null);
 
-            return new CloudEventContext(receiveContext, message, _types);
+            return new CloudEventContext(receiveContext, message, _types, Options);
         }
 
         public ContentType ContentType
@@ -31,7 +31,9 @@ namespace MassTransit.CloudEvents
             set; 
         } = new ("application/cloudevents+json");
 
-       
+        public JsonSerializerOptions Options { get; } = new() { PropertyNameCaseInsensitive = true };
+
+
         public void AddType<T>(string type) => 
             _types[type] = typeof(T);
 
@@ -39,13 +41,15 @@ namespace MassTransit.CloudEvents
         {
             private readonly CloudEvent _cloudEvent;
             private readonly Dictionary<string, Type> _mappings;
-            private readonly JsonSerializerOptions _options = new() { PropertyNameCaseInsensitive = true };
+            private readonly JsonSerializerOptions _options;
 
-            public CloudEventContext(ReceiveContext receiveContext, CloudEvent cloudEvent, Dictionary<string, Type> mappings) 
+            public CloudEventContext(ReceiveContext receiveContext, CloudEvent cloudEvent,
+                Dictionary<string, Type> mappings, JsonSerializerOptions options) 
                 : base(receiveContext)
             {
                 _cloudEvent = cloudEvent;
                 _mappings = mappings;
+                _options = options;
             }
 
             public override bool HasMessageType(Type messageType) =>

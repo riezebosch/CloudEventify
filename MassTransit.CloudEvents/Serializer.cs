@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Mime;
+using System.Text.Json;
 using CloudNative.CloudEvents;
 
 namespace MassTransit.CloudEvents
@@ -21,7 +22,7 @@ namespace MassTransit.CloudEvents
                 Time = context.SentTime
             };
 
-            stream.Write(cloudEvent.ToMessage().Span);
+            stream.Write(cloudEvent.ToMessage(Options).Span);
         }
 
         public ContentType ContentType
@@ -29,6 +30,8 @@ namespace MassTransit.CloudEvents
             get;
             set;
         } = new("application/cloudevents+json");
+
+        public JsonSerializerOptions Options { get; } = new();
 
         public void AddType<T>(string type) =>
             _types[typeof(T)] = type;

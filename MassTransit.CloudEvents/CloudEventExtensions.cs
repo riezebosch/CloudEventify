@@ -20,9 +20,9 @@ namespace MassTransit.CloudEvents
             return (T)JsonSerializer.Deserialize(buffer.WrittenSpan, type, options);
         }
 
-        public static ReadOnlyMemory<byte> ToMessage(this CloudEvent cloudEvent)
+        public static ReadOnlyMemory<byte> ToMessage(this CloudEvent cloudEvent, JsonSerializerOptions options = null)
         {
-            var formatter = new JsonEventFormatter();
+            var formatter = new JsonEventFormatter(options, new JsonDocumentOptions());
             return formatter.EncodeStructuredModeMessage(cloudEvent, out _);
         }
     }

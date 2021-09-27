@@ -1,4 +1,6 @@
+using System;
 using System.Net.Mime;
+using System.Text.Json;
 
 namespace MassTransit.CloudEvents
 {
@@ -25,6 +27,14 @@ namespace MassTransit.CloudEvents
         {
             _deserializer.AddType<T>(type);
             _serializer.AddType<T>(type);
+            
+            return this;
+        }
+
+        IConfigurator IConfigurator.WithJsonOptions(Action<JsonSerializerOptions> options)
+        {
+            options(_serializer.Options);
+            options(_deserializer.Options);
             
             return this;
         }
