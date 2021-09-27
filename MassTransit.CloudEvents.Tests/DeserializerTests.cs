@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using CloudNative.CloudEvents;
 using FluentAssertions;
@@ -15,13 +16,52 @@ namespace MassTransit.CloudEvents.Tests
     public class DeserializerTests
     {
         [Fact]
-        public void UseMessageIdFromCloudEvent()
+        public void UnusedPropertiesMapToDefaults()
         {
+            // Arrange
             var cloudEvent = new CloudEvent(CloudEventsSpecVersion.Default)
             {
                 Data = "hello",
                 Source = new Uri("https://google.nl"),
-                Id = Guid.NewGuid().ToString(),
+                Id = "1",
+                Type = "my-custom-event"
+            };
+
+            using var receive = ReceiveContext(cloudEvent.ToMessage());
+            var serializer = new Deserializer().As<IMessageDeserializer>();
+            
+            // Act
+            var consume = serializer.Deserialize(receive);
+            
+            // Assert
+            consume
+                .Should()
+                .BeEquivalentTo(new
+                {
+                    MessageId = (Guid?)null,
+                    RequestId = (Guid?)null,
+                    CorrelationId = (Guid?)null,
+                    ConversationId = (Guid?)null,
+                    InitiatorId = (Guid?)null,
+                    ExpirationTime = (DateTime?)null,
+                    DestinationAddress = (Uri)null,
+                    ResponseAddress = (Uri)null,
+                    FaultAddress = (Uri)null,
+                    Headers = (Headers)null,
+                    Host = (HostInfo)null,
+                    SupportedMessageTypes = (IEnumerable<string>)null
+                });
+        }
+        
+        [Fact]
+        public void UseMessageIdFromCloudEvent()
+        {
+            var id = Guid.NewGuid();
+            var cloudEvent = new CloudEvent(CloudEventsSpecVersion.Default)
+            {
+                Data = "hello",
+                Source = new Uri("https://google.nl"),
+                Id = id.ToString(),
                 Type = "my-custom-event"
             };
 
@@ -30,9 +70,8 @@ namespace MassTransit.CloudEvents.Tests
             var serializer = new Deserializer().As<IMessageDeserializer>();
             serializer.Deserialize(context)
                 .MessageId
-                .ToString()
                 .Should()
-                .Be(cloudEvent.Id);
+                .Be(id);
         }
 
         [Fact]
@@ -42,7 +81,7 @@ namespace MassTransit.CloudEvents.Tests
             {
                 Data = "hello",
                 Source = new Uri("https://google.nl"),
-                Id = Guid.NewGuid().ToString(),
+                Id = "1",
                 Type = "my-custom-event"
             };
 
@@ -97,14 +136,14 @@ namespace MassTransit.CloudEvents.Tests
         }
         
         [Fact]
-        public void Unknown()
+        public void SpecificTypeNotMapped()
         {
             var cloudEvent = new CloudEvent(CloudEventsSpecVersion.Default)
             {
-                Data = JsonSerializer.Deserialize<object>(@"{ ""id"": 1234 }"),
+                Data = new { id =  1234 },
                 Source = new Uri("https://google.nl"),
                 Id = "1",
-                Type = "my-custom-event"
+                Type = "ignored"
             };
 
             using var receive = ReceiveContext(cloudEvent.ToMessage());
@@ -125,11 +164,11 @@ namespace MassTransit.CloudEvents.Tests
         }
         
         [Fact]
-        public void Mapped()
+        public void FromInterface()
         {
             var cloudEvent = new CloudEvent(CloudEventsSpecVersion.Default)
             {
-                Data = JsonSerializer.Deserialize<object>(@"{ ""id"": 1234 }"),
+                Data = new { id = 1234 },
                 Source = new Uri("https://google.nl"),
                 Id = "1",
                 Type = "user/loggedIn"
@@ -151,23 +190,23 @@ namespace MassTransit.CloudEvents.Tests
             
             consume
                 .Message
+                .Id
                 .Should()
-                .Be(new UserLoggedIn(1234));
+                .Be(1234);
         }
         
         [Fact]
-        public void Unmapped()
+        public void FromInterfaceUnmapped()
         {
             var cloudEvent = new CloudEvent(CloudEventsSpecVersion.Default)
             {
-                Data = JsonSerializer.Deserialize<object>(@"{ ""id"": 1234 }"),
+                Data = new { Id = 1234 },
                 Source = new Uri("https://google.nl"),
                 Id = "1",
-                Type = "user/loggedIn"
+                Type = "unmapped"
             };
 
             using var receive = ReceiveContext(cloudEvent.ToMessage());
-
             var context = new Deserializer()
                 .As<IMessageDeserializer>()
                 .Deserialize(receive)
@@ -177,6 +216,28 @@ namespace MassTransit.CloudEvents.Tests
                 .TryGetMessage<IEvent>(out _)
                 .Should()
                 .BeFalse();
+        }
+
+        [Fact]
+        public void PretendToHaveAllMessageTypes()
+        {
+            var cloudEvent = new CloudEvent(CloudEventsSpecVersion.Default)
+            {
+                Data = "hello",
+                Source = new Uri("https://google.nl"),
+                Id = "1",
+                Type = "user/loggedIn"
+            };
+
+            using var receive = ReceiveContext(cloudEvent.ToMessage());
+            var consume = new Deserializer()
+                .As<IMessageDeserializer>()
+                .Deserialize(receive);
+            
+            consume
+                .HasMessageType(typeof(int))
+                .Should()
+                .BeTrue();
         }
 
         private interface IEvent
