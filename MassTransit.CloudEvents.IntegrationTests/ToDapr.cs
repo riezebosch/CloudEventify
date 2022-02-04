@@ -15,12 +15,16 @@ using Xunit.Abstractions;
 namespace MassTransit.CloudEvents.IntegrationTests;
 
 [Collection("user/loggedIn")]
-public class ToDapr
+public class ToDapr : IClassFixture<RabbitMqContainer>
 {
     private readonly ITestOutputHelper _output;
+    private readonly RabbitMqContainer _container;
 
-    public ToDapr(ITestOutputHelper output) => 
+    public ToDapr(ITestOutputHelper output, RabbitMqContainer container)
+    {
         _output = output;
+        _container = container;
+    }
 
     [Fact]
     public async Task Do()
@@ -73,6 +77,7 @@ public class ToDapr
         var bus = Bus.Factory
             .CreateUsingRabbitMq(cfg =>
             {
+                cfg.Host(_container.ConnectionString);
                 cfg.UseCloudEvents()
                     .Type<UserLoggedIn>("loggedIn");
                     
