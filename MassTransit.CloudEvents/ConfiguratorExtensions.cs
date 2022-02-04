@@ -1,27 +1,26 @@
-namespace MassTransit.CloudEvents
+namespace MassTransit.CloudEvents;
+
+public static class ConfiguratorExtensions
 {
-    public static class ConfiguratorExtensions
+    public static IConfigurator UseCloudEvents(this IBusFactoryConfigurator cfg)
     {
-        public static IConfigurator UseCloudEvents(this IBusFactoryConfigurator cfg)
-        {
-            var deserializer = new Deserializer();
-            cfg.AddMessageDeserializer(deserializer.ContentType, () => deserializer);
+        var deserializer = new Deserializer();
+        cfg.AddMessageDeserializer(deserializer.ContentType, () => deserializer);
 
-            var serializer = new Serializer();
-            cfg.SetMessageSerializer(() => serializer);
+        var serializer = new Serializer();
+        cfg.SetMessageSerializer(() => serializer);
 
-            return new Configurator(serializer, deserializer);
-        }
+        return new Configurator(serializer, deserializer);
+    }
 
-        public static IConfigurator UseCloudEvents(this IReceiveEndpointConfigurator cfg)
-        {
-            var deserializer = new Deserializer();
-            cfg.AddMessageDeserializer(deserializer.ContentType, () => deserializer);
+    public static IConfigurator UseCloudEvents(this IReceiveEndpointConfigurator cfg)
+    {
+        var deserializer = new Deserializer();
+        cfg.AddMessageDeserializer(deserializer.ContentType, () => deserializer);
 
-            var serializer = new Serializer();
-            cfg.SetMessageSerializer(() => serializer);
+        var serializer = new Serializer();
+        cfg.SetMessageSerializer(() => serializer);
 
-            return new Configurator(serializer, deserializer);
-        }
+        return new Configurator(serializer, deserializer);
     }
 }
