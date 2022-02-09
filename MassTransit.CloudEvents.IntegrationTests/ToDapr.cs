@@ -31,21 +31,20 @@ public class ToDapr
             .For<int>()
             .Any(x => x == message.UserId);
 
-        using var logger = _output.BuildLogger();
         await using var host = await Host(hypothesis.ToHandler());
-        await using var sidecar = await Sidecar(logger);
+        await using var sidecar = await Sidecar(_output);
             
         // Act
-        await Publish(message, logger);
+        await Publish(message, _output);
 
         // Assert
         await hypothesis.Validate(10.Seconds());
     }
         
         
-    private static async Task<Sidecar> Sidecar(ILogger logger)
+    private static async Task<Sidecar> Sidecar(ITestOutputHelper logger)
     {
-        var sidecar = new Sidecar("to-dapr", logger);
+        var sidecar = new Sidecar("to-dapr", logger.ToLogger<Sidecar>());
         await sidecar.Start(with => with
             .ComponentsPath("components")
             .AppPort(6000));
@@ -58,7 +57,7 @@ public class ToDapr
         var app = Startup.App(builder =>
         {
             builder.Services.AddSingleton(handler);
-            builder.Logging.AddXunit(_output);
+            builder.Logging.AddXUnit(_output);
         });
         
         app.Urls.Add("http://localhost:6000");
@@ -67,9 +66,9 @@ public class ToDapr
         return app;
     }
 
-    private static async Task Publish(UserLoggedIn message, ILogger logger)
+    private async Task Publish(UserLoggedIn message, ITestOutputHelper logger)
     {
-        LogContext.ConfigureCurrentLogContext(logger);
+        LogContext.ConfigureCurrentLogContext(logger.ToLoggerFactory());
             
         var bus = Bus.Factory
             .CreateUsingRabbitMq(cfg =>

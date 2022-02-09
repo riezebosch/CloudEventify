@@ -5,7 +5,6 @@ using Dapr.Client;
 using FluentAssertions.Extensions;
 using Hypothesist;
 using MassTransit.Context;
-using Microsoft.Extensions.Logging;
 using Wrapr;
 using Xunit;
 using Xunit.Abstractions;
@@ -29,8 +28,7 @@ public class FromDapr
             .For<UserLoggedIn>()
             .Any(x => x == message);
 
-        using var logger = _output.BuildLogger();
-        LogContext.ConfigureCurrentLogContext(logger);
+        LogContext.ConfigureCurrentLogContext(_output.ToLoggerFactory());
             
         var bus = Bus.Factory
             .CreateUsingRabbitMq(cfg =>
@@ -50,7 +48,7 @@ public class FromDapr
         await bus.StartAsync();
             
         // Act
-        await Publish(message, logger);
+        await Publish(message, _output);
 
         // Assert
         await hypothesis.Validate(15.Seconds());
@@ -65,8 +63,7 @@ public class FromDapr
             .For<UserLoggedIn>()
             .Any(x => x == message);
 
-        using var logger = _output.BuildLogger();
-        LogContext.ConfigureCurrentLogContext(logger);
+        LogContext.ConfigureCurrentLogContext(_output.ToLoggerFactory());
             
         var bus = Bus.Factory
             .CreateUsingRabbitMq(cfg =>
@@ -82,16 +79,16 @@ public class FromDapr
         await bus.StartAsync();
 
         // Act
-        await Publish(message, logger);
+        await Publish(message, _output);
 
         // Assert
         await hypothesis.Validate(10.Seconds());
     }
 
 
-    private static async Task Publish(UserLoggedIn message, ILogger logger)
+    private static async Task Publish(UserLoggedIn message, ITestOutputHelper logger)
     {
-        await using var sidecar = new Sidecar("from-dapr", logger);
+        await using var sidecar = new Sidecar("from-dapr", logger.ToLogger<Sidecar>());
         await sidecar.Start(with => with
             .ComponentsPath("components")
             .DaprGrpcPort(3001));
