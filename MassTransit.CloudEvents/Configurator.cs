@@ -4,29 +4,21 @@ using System.Text.Json;
 
 namespace MassTransit.CloudEvents;
 
-internal class Configurator : IConfigurator
+internal class Configurator : IConfigurator, ITypeMap
 {
     private readonly Serializer _serializer;
     private readonly Deserializer _deserializer;
-
+    
     public Configurator(Serializer serializer, Deserializer deserializer)
     {
         _serializer = serializer;
         _deserializer = deserializer;
     }
-        
-    public IConfigurator WithContentType(ContentType contentType)
+
+    IConfigurator IConfigurator.WithContentType(ContentType contentType)
     {
         _serializer.ContentType =
             _deserializer.ContentType = contentType;
-            
-        return this;
-    }
-
-    public IConfigurator Type<T>(string type)
-    {
-        _deserializer.AddType<T>(type);
-        _serializer.AddType<T>(type);
             
         return this;
     }
@@ -36,6 +28,26 @@ internal class Configurator : IConfigurator
         options(_serializer.Options);
         options(_deserializer.Options);
             
+        return this;
+    }
+
+    IConfigurator IConfigurator.Type<T>(string type)
+    {
+        Map<T>(type);
+        return this;
+    }
+
+    IConfigurator IConfigurator.WithTypes(Func<ITypeMap, ITypeMap> map)
+    {
+        map(this);
+        return this;
+    }
+
+    public ITypeMap Map<T>(string type)
+    {
+        _serializer.AddType<T>(type);    
+        _deserializer.AddType<T>(type);
+
         return this;
     }
 }

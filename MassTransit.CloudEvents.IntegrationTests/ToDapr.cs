@@ -79,7 +79,7 @@ public class ToDapr : IClassFixture<RabbitMqContainer>
             {
                 cfg.Host(_container.ConnectionString);
                 cfg.UseCloudEvents()
-                    .Type<UserLoggedIn>("loggedIn");
+                    .WithTypes(t => t.Map<UserLoggedIn>("loggedIn"));
                     
                 // set the topic/exchange
                 cfg.Message<UserLoggedIn>(x => 

@@ -177,7 +177,8 @@ public class DeserializerTests
 
         using var receive = ReceiveContext(cloudEvent.ToMessage());
         var deserializer = new Deserializer();
-        deserializer.AddType<UserLoggedIn>("user/loggedIn");
+        deserializer            
+            .AddType<UserLoggedIn>("user/loggedIn");
 
         var context = deserializer
             .As<IMessageDeserializer>()
