@@ -4,9 +4,10 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using FluentAssertions.Extensions;
 using Hypothesist;
+using MassTransit;
 using Xunit;
 
-namespace MassTransit.CloudEvents.Tests;
+namespace CloudEventify.MassTransit.Tests;
 
 public class UseCloudEventsTests
 {

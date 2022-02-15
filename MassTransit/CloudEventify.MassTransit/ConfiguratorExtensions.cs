@@ -1,4 +1,6 @@
-namespace MassTransit.CloudEvents;
+using MassTransit;
+
+namespace CloudEventify.MassTransit;
 
 public static class ConfiguratorExtensions
 {

@@ -5,6 +5,7 @@ using DaprApp;
 using FluentAssertions.Extensions;
 using Hypothesist;
 using DaprApp.Controllers;
+using MassTransit;
 using MassTransit.Context;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -12,7 +13,7 @@ using Wrapr;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace MassTransit.CloudEvents.IntegrationTests;
+namespace CloudEventify.MassTransit.IntegrationTests;
 
 [Collection("user/loggedIn")]
 public class ToDapr : IClassFixture<RabbitMqContainer>

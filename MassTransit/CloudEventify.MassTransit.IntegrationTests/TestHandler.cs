@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using DaprApp.Controllers;
 using Hypothesist;
 
-namespace MassTransit.CloudEvents.IntegrationTests;
+namespace CloudEventify.MassTransit.IntegrationTests;
 
 internal static class TestHandler
 {

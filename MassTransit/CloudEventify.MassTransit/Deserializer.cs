@@ -6,9 +6,10 @@ using System.Text.Json;
 using CloudNative.CloudEvents;
 using CloudNative.CloudEvents.SystemTextJson;
 using GreenPipes;
+using MassTransit;
 using MassTransit.Context;
 
-namespace MassTransit.CloudEvents;
+namespace CloudEventify.MassTransit;
 
 public class Deserializer : IMessageDeserializer
 {

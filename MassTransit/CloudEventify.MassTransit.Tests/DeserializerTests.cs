@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text.Json;
 using CloudNative.CloudEvents;
 using FluentAssertions;
+using MassTransit;
+using CloudEventify.MassTransit;
 using MassTransit.Context;
 using MassTransit.Topology.EntityNameFormatters;
 using MassTransit.Topology.Topologies;
@@ -12,7 +14,7 @@ using MassTransit.Transports.InMemory.Contexts;
 using MassTransit.Transports.InMemory.Fabric;
 using Xunit;
 
-namespace MassTransit.CloudEvents.Tests;
+namespace CloudEventify.MassTransit.Tests;
 
 public class DeserializerTests
 {

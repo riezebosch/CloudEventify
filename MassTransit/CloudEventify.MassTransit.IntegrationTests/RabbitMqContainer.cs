@@ -3,7 +3,7 @@ using Ductus.FluentDocker.Builders;
 using Ductus.FluentDocker.Services;
 using Ductus.FluentDocker.Services.Extensions;
 
-namespace MassTransit.CloudEvents.IntegrationTests;
+namespace CloudEventify.MassTransit.IntegrationTests;
 
 public sealed class RabbitMqContainer : IDisposable
 {

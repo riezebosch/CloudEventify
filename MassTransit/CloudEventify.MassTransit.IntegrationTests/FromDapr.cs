@@ -4,12 +4,13 @@ using Bogus;
 using Dapr.Client;
 using FluentAssertions.Extensions;
 using Hypothesist;
+using MassTransit;
 using MassTransit.Context;
 using Wrapr;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace MassTransit.CloudEvents.IntegrationTests;
+namespace CloudEventify.MassTransit.IntegrationTests;
 
 [Collection("user/loggedIn")]
 public class FromDapr : IClassFixture<RabbitMqContainer>

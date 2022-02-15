@@ -1,4 +1,4 @@
-namespace MassTransit.CloudEvents;
+namespace CloudEventify.MassTransit;
 
 public interface ITypeMap
 {

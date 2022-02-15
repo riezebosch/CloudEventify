@@ -4,8 +4,9 @@ using System.IO;
 using System.Net.Mime;
 using System.Text.Json;
 using CloudNative.CloudEvents;
+using MassTransit;
 
-namespace MassTransit.CloudEvents;
+namespace CloudEventify.MassTransit;
 
 public class Serializer : IMessageSerializer
 {

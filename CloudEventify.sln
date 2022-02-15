@@ -1,10 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.CloudEvents.Tests", "MassTransit.CloudEvents.Tests\MassTransit.CloudEvents.Tests.csproj", "{0B86FD16-2A60-4F31-8682-3A9539F10323}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventify.MassTransit.Tests", "MassTransit\CloudEventify.MassTransit.Tests\CloudEventify.MassTransit.Tests.csproj", "{0B86FD16-2A60-4F31-8682-3A9539F10323}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.CloudEvents", "MassTransit.CloudEvents\MassTransit.CloudEvents.csproj", "{5DDA7642-DF55-4D9D-829D-85EE744BB6C3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventify.MassTransit", "MassTransit\CloudEventify.MassTransit\CloudEventify.MassTransit.csproj", "{5DDA7642-DF55-4D9D-829D-85EE744BB6C3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.CloudEvents.IntegrationTests", "MassTransit.CloudEvents.IntegrationTests\MassTransit.CloudEvents.IntegrationTests.csproj", "{426EC264-6DF2-4187-AA12-C8965634E462}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventify.MassTransit.IntegrationTests", "MassTransit\CloudEventify.MassTransit.IntegrationTests\CloudEventify.MassTransit.IntegrationTests.csproj", "{426EC264-6DF2-4187-AA12-C8965634E462}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaprApp", "DaprApp\DaprApp.csproj", "{6EBF260C-D04E-48D5-99F9-5790817F5595}"
 EndProject
@@ -16,6 +16,8 @@ ProjectSection(SolutionItems) = preProject
 	.gitignore = .gitignore
 	README.md = README.md
 EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MassTransit", "MassTransit", "{E89E8096-5E2A-484A-8D4C-7E4A0C2E5F09}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,5 +45,10 @@ Global
 		{976A9E50-ACDA-4738-8D76-352462875F26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{976A9E50-ACDA-4738-8D76-352462875F26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{976A9E50-ACDA-4738-8D76-352462875F26}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5DDA7642-DF55-4D9D-829D-85EE744BB6C3} = {E89E8096-5E2A-484A-8D4C-7E4A0C2E5F09}
+		{426EC264-6DF2-4187-AA12-C8965634E462} = {E89E8096-5E2A-484A-8D4C-7E4A0C2E5F09}
+		{0B86FD16-2A60-4F31-8682-3A9539F10323} = {E89E8096-5E2A-484A-8D4C-7E4A0C2E5F09}
 	EndGlobalSection
 EndGlobal

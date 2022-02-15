@@ -23,7 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\MassTransit.CloudEvents\MassTransit.CloudEvents.csproj" />
+      <ProjectReference Include="..\CloudEventify.MassTransit\CloudEventify.MassTransit.csproj" />
     </ItemGroup>
 
 </Project>

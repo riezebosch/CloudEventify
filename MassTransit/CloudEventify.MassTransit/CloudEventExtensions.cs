@@ -4,7 +4,7 @@ using System.Text.Json;
 using CloudNative.CloudEvents;
 using CloudNative.CloudEvents.SystemTextJson;
 
-namespace MassTransit.CloudEvents;
+namespace CloudEventify.MassTransit;
 
 public static class CloudEventExtensions
 {

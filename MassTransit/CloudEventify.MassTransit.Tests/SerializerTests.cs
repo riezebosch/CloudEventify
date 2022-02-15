@@ -4,10 +4,11 @@ using System.Text.Json;
 using Bogus;
 using CloudNative.CloudEvents;
 using FluentAssertions;
+using CloudEventify.MassTransit;
 using MassTransit.Context;
 using Xunit;
 
-namespace MassTransit.CloudEvents.Tests;
+namespace CloudEventify.MassTransit.Tests;
 
 public class SerializerTests
 {

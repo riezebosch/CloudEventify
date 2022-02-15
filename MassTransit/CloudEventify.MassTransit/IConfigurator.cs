@@ -2,7 +2,7 @@ using System;
 using System.Net.Mime;
 using System.Text.Json;
 
-namespace MassTransit.CloudEvents;
+namespace CloudEventify.MassTransit;
 
 public interface IConfigurator
 {
