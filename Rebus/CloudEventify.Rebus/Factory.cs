@@ -5,6 +5,11 @@ namespace CloudEventify.Rebus;
 
 public static class Factory
 {
-    public static void UseCloudEvents(this StandardConfigurer<ISerializer> s) => 
-        s.Register(r => new Serializer());
+    public static ICloudEvents UseCloudEvents(this StandardConfigurer<ISerializer> s)
+    {
+        var builder = new Builder();
+        s.Register(_ => builder.New());
+
+        return builder;
+    }
 }

@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using CloudNative.CloudEvents;
 using FluentAssertions;
 using MassTransit;
-using CloudEventify.MassTransit;
 using MassTransit.Context;
 using MassTransit.Topology.EntityNameFormatters;
 using MassTransit.Topology.Topologies;
@@ -18,6 +16,9 @@ namespace CloudEventify.MassTransit.Tests;
 
 public class DeserializerTests
 {
+    private readonly CloudEventFormatter _formatter = Formatter.New(new JsonSerializerOptions
+        { PropertyNameCaseInsensitive = true });
+    
     [Fact]
     public void UnusedPropertiesMapToDefaults()
     {
@@ -30,8 +31,8 @@ public class DeserializerTests
             Type = "my-custom-event"
         };
 
-        using var receive = ReceiveContext(cloudEvent.ToMessage());
-        var serializer = new Deserializer().As<IMessageDeserializer>();
+        using var receive = ReceiveContext(_formatter.Encode(cloudEvent));
+        var serializer = Serializer(types => types.Map<string>("my-custom-event"));
             
         // Act
         var consume = serializer.Deserialize(receive);
@@ -55,7 +56,13 @@ public class DeserializerTests
                 SupportedMessageTypes = Enumerable.Empty<string>()
             });
     }
-        
+
+    private static IMessageDeserializer Serializer(Func<ITypesMap, ITypesMap> map)
+    {
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        return new Deserializer(null!, Formatter.New(options), new Unwrap(map(new TypesMapper()), options));
+    }
+
     [Fact]
     public void UseMessageIdFromCloudEvent()
     {
@@ -68,9 +75,9 @@ public class DeserializerTests
             Type = "my-custom-event"
         };
 
-        using var context = ReceiveContext(cloudEvent.ToMessage());
-
-        var serializer = new Deserializer().As<IMessageDeserializer>();
+        using var context = ReceiveContext(_formatter.Encode(cloudEvent));
+        
+        var serializer = Serializer(types => types.Map<string>("my-custom-event"));
         serializer.Deserialize(context)
             .MessageId
             .Should()
@@ -88,13 +95,12 @@ public class DeserializerTests
             Type = "my-custom-event"
         };
 
-        using var context = ReceiveContext(cloudEvent.ToMessage());
-
-        var serializer = new Deserializer().As<IMessageDeserializer>();
+        using var context = ReceiveContext(_formatter.Encode(cloudEvent));
+        var serializer = Serializer(types => types.Map<string>("my-custom-event"));
         serializer.Deserialize(context)
             .SourceAddress
             .Should()
-            .Be(cloudEvent.Source);
+            .Be("https://google.nl/");
     }
 
     [Fact]
@@ -110,9 +116,9 @@ public class DeserializerTests
             Time = sent
         };
 
-        using var context = ReceiveContext(cloudEvent.ToMessage());
+        using var context = ReceiveContext(_formatter.Encode(cloudEvent));
 
-        var serializer = new Deserializer().As<IMessageDeserializer>();
+        var serializer = Serializer(types => types.Map<string>("my-custom-event"));
         serializer.Deserialize(context)
             .SentTime
             .Should()
@@ -130,8 +136,8 @@ public class DeserializerTests
             Type = "my-custom-event"
         };
 
-        using var context = ReceiveContext(cloudEvent.ToMessage());
-        var serializer = new Deserializer().As<IMessageDeserializer>();
+        using var context = ReceiveContext(_formatter.Encode(cloudEvent));
+        var serializer = Serializer(types => types.Map<string>("my-custom-event"));
         serializer.Deserialize(context)
             .MessageId
             .Should()
@@ -149,21 +155,15 @@ public class DeserializerTests
             Type = "ignored"
         };
 
-        using var receive = ReceiveContext(cloudEvent.ToMessage());
-        var context = new Deserializer()
-            .As<IMessageDeserializer>()
+        using var receive = ReceiveContext(_formatter.Encode(cloudEvent));
+        var context = Serializer(types => types)
             .Deserialize(receive)
             .As<DeserializerConsumeContext>();
             
         context
-            .TryGetMessage<UserLoggedIn>(out var consume)
+            .TryGetMessage<UserLoggedIn>(out _)
             .Should()
-            .BeTrue();
-            
-        consume
-            .Message
-            .Should()
-            .Be(new UserLoggedIn(1234));
+            .BeFalse();
     }
         
     [Fact]
@@ -177,12 +177,9 @@ public class DeserializerTests
             Type = "user/loggedIn"
         };
 
-        using var receive = ReceiveContext(cloudEvent.ToMessage());
-        var deserializer = new Deserializer();
-        deserializer            
-            .AddType<UserLoggedIn>("user/loggedIn");
-
-        var context = deserializer
+        using var receive = ReceiveContext(_formatter.Encode(cloudEvent));
+        var serializer = Serializer(types => types.Map<UserLoggedIn>("user/loggedIn"));
+        var context = serializer
             .As<IMessageDeserializer>()
             .Deserialize(receive)
             .As<DeserializerConsumeContext>();
@@ -210,9 +207,8 @@ public class DeserializerTests
             Type = "unmapped"
         };
 
-        using var receive = ReceiveContext(cloudEvent.ToMessage());
-        var context = new Deserializer()
-            .As<IMessageDeserializer>()
+        using var receive = ReceiveContext(_formatter.Encode(cloudEvent));
+        var context = Serializer(types => types)
             .Deserialize(receive)
             .As<DeserializerConsumeContext>();
             
@@ -233,11 +229,11 @@ public class DeserializerTests
             Type = "user/loggedIn"
         };
 
-        using var receive = ReceiveContext(cloudEvent.ToMessage());
-        var consume = new Deserializer()
+        using var receive = ReceiveContext(_formatter.Encode(cloudEvent));
+        var consume = Serializer(types => types.Map<string>("my-custom-event"))
             .As<IMessageDeserializer>()
             .Deserialize(receive);
-            
+
         consume
             .HasMessageType(typeof(int))
             .Should()

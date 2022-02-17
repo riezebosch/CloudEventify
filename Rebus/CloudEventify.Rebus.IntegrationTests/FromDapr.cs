@@ -42,12 +42,13 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
             .Register(hypothesis.AsHandler);
         var subscriber = Configure.With(activator)
             .Transport(t => t.UseRabbitMq(_container.ConnectionString, queue))
-            .Serialization(s => s.UseCloudEvents())
+            .Serialization(s => s.UseCloudEvents()
+                .WithTypes(t => t.Map<UserLoggedIn>("loggedIn")))
             .Logging(l => l.MicrosoftExtensionsLogging(_output.ToLoggerFactory()))
             .Start();
         await subscriber.Subscribe<UserLoggedIn>();
 
-        RouteToRebus(_container.ConnectionString, topic, queue);
+        BindRebus(_container.ConnectionString, topic, queue);
         
         // Act
         await Publish(topic, message, _output);
@@ -56,7 +57,7 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
         await hypothesis.Validate(5.Seconds());
     }
     
-    private static void RouteToRebus(string connectionString, string topic, string queue)
+    private static void BindRebus(string connectionString, string topic, string queue)
     {
         var model = new ConnectionFactory
             {
@@ -74,22 +75,14 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
         await using var sidecar = new Sidecar("from-dapr-to-rabbitmq", logger.ToLogger<Sidecar>());
         await sidecar.Start(with => with
             .ComponentsPath("components")
-            .DaprGrpcPort(3001));
+            .DaprGrpcPort(3201));
 
-        // using var client = new DaprClientBuilder()
-        //     .UseGrpcEndpoint("http://localhost:3001")
-        //     .Build();
-        // await client.PublishEventAsync("my-pubsub", "user/loggedIn", message);
+        using var client = CloudEventClientBuilder
+            .For("http://localhost:3201")
+            .WithTypes(types => types.Map<UserLoggedIn>("loggedIn"))
+            .Build();
         
-        // var client = new HttpClient();
-        // var content = new ByteArrayContent(envelope);
-        // content.Headers.ContentType = new MediaTypeHeaderValue("application/cloudevents+json");
-        //
-        // var response = await client.PostAsync("http://localhost:3002/v1.0/publish/my-pubsub/user/loggedIn", content);
-        // logger.LogInformation(await response.Content.ReadAsStringAsync());
-        // response.EnsureSuccessStatusCode();
-        
-        await new DaprClient("http://localhost:3001")
+        await client
             .PublishEvent("my-pubsub", topic, message);
     }
 

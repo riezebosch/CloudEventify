@@ -1,5 +1,4 @@
 using CloudNative.CloudEvents;
-using CloudNative.CloudEvents.SystemTextJson;
 using Rebus.Messages;
 using Rebus.Serialization;
 
@@ -7,31 +6,28 @@ namespace CloudEventify.Rebus;
 
 internal class Serializer : ISerializer
 {
-    Task<TransportMessage> ISerializer.Serialize(Message message)
+    private readonly CloudEventFormatter _formatter;
+    private readonly Wrap _wrap;
+    private readonly Unwrap _unwrap;
+
+    public Serializer(CloudEventFormatter formatter, Wrap wrap, Unwrap unwrap)
     {
-        var cloudEvent = new CloudEvent(CloudEventsSpecVersion.Default)
-        {
-            Data = message.Body,
-            Source = new Uri("cloudeventify:rebus"),
-            Id = message.Headers[Headers.MessageId],
-            Type = message.Headers[Headers.Type],
-            Time = DateTimeOffset.Parse(message.Headers[Headers.SentTime])
-        };
-        
-        return Task.FromResult(new TransportMessage(message.Headers, cloudEvent.ToMessage()));
+        _formatter = formatter;
+        _wrap = wrap;
+        _unwrap = unwrap;
     }
+
+    Task<TransportMessage> ISerializer.Serialize(Message message) => 
+        Task.FromResult(new TransportMessage(message.Headers, _formatter.Encode(_wrap.Envelope(message))));
 
     Task<Message> ISerializer.Deserialize(TransportMessage transportMessage)
     {
-        var formatter = new JsonEventFormatter();
-        var cloudEvent = formatter.DecodeStructuredModeMessage(transportMessage.Body, null, null);
-
+        var cloudEvent = _formatter.Decode(transportMessage.Body);
         var headers = new Dictionary<string, string>
         {
-            [Headers.MessageId] = cloudEvent.Id!
+            [Headers.MessageId] = cloudEvent.Id!,
         };
 
-        var body = cloudEvent.ToObject(Type.GetType(cloudEvent.Type));
-        return Task.FromResult(new Message(headers, body));
+        return Task.FromResult(new Message(headers, _unwrap.Envelope(cloudEvent)));
     }
 }

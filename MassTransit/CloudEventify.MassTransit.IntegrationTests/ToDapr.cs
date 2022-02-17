@@ -36,8 +36,8 @@ public class ToDapr : IClassFixture<RabbitMqContainer>
             .For<int>()
             .Any(x => x == message.UserId);
 
-        await using var host = await Host(hypothesis.ToHandler());
-        await using var sidecar = await Sidecar(_output);
+        await using var host = await Host(hypothesis.ToHandler(), 6123);
+        await using var sidecar = await Sidecar(_output, 6123);
             
         // Act
         await Publish(message, _output);
@@ -47,17 +47,17 @@ public class ToDapr : IClassFixture<RabbitMqContainer>
     }
         
         
-    private static async Task<Sidecar> Sidecar(ITestOutputHelper logger)
+    private static async Task<Sidecar> Sidecar(ITestOutputHelper logger, int port)
     {
-        var sidecar = new Sidecar("to-dapr", logger.ToLogger<Sidecar>());
+        var sidecar = new Sidecar("masstransit-to-dapr", logger.ToLogger<Sidecar>());
         await sidecar.Start(with => with
             .ComponentsPath("components")
-            .AppPort(6000));
+            .AppPort(port));
 
         return sidecar;
     }
 
-    private async Task<IAsyncDisposable> Host(IHandler<int> handler)
+    private async Task<IAsyncDisposable> Host(IHandler<int> handler, int port)
     {
         var app = Startup.App(builder =>
         {
@@ -65,7 +65,7 @@ public class ToDapr : IClassFixture<RabbitMqContainer>
             builder.Logging.AddXUnit(_output);
         });
         
-        app.Urls.Add("http://localhost:6000");
+        app.Urls.Add($"http://localhost:{port}");
         await app.StartAsync();
         
         return app;

@@ -22,6 +22,7 @@ public class UseCloudEventsTests
         var bus = Bus.Factory.CreateUsingInMemory(cfg =>
         {
             cfg.UseCloudEvents()
+                .WithTypes(types => types.Map<UserLoggedIn>("user.loggedIn"))
                 .WithJsonOptions(options => options.Converters.Add(converter));
 
             cfg.ReceiveEndpoint("test", 

@@ -37,7 +37,7 @@ public static class Startup
         var builder = WebApplication.CreateBuilder(args);
         builder
             .Services
-            .AddControllers().AddApplicationPart(typeof(Startup).Assembly).AddDapr(builder => builder.UseGrpcEndpoint("asdf"));
+            .AddControllers().AddApplicationPart(typeof(Startup).Assembly).AddDapr(options => options.UseGrpcEndpoint("asdf"));
         
         return builder;
     }

@@ -26,17 +26,16 @@ public class UserControllerTests
             .For<int>()
             .Any(x => x == 1234);
 
-        using var logger = _output.BuildLogger();
         await using var host = await Host(hypothesis);
-        await using var sidecar = await Sidecar(logger);
+        await using var sidecar = await Sidecar(_output);
         await Publish();
 
         await hypothesis.Validate(10.Seconds());
     }
 
-    private static async Task<Sidecar> Sidecar(ILogger logger)
+    private static async Task<Sidecar> Sidecar(ITestOutputHelper logger)
     {
-        var sidecar = new Sidecar("test-dapr", logger);
+        var sidecar = new Sidecar("test-dapr", logger.ToLogger<Sidecar>());
         await sidecar.Start(with => with
             .ComponentsPath("components")
             .DaprGrpcPort(3002)
@@ -54,7 +53,7 @@ public class UserControllerTests
                 .AddSingleton<IHandler<int>>(new TestHandler<int>(hypothesis));
             builder
                 .Logging
-                .AddXunit(_output);
+                .AddXUnit(_output);
         });
 
         app.Urls.Add("http://localhost:6002");

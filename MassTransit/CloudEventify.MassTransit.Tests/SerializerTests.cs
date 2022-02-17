@@ -1,10 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using Bogus;
 using CloudNative.CloudEvents;
 using FluentAssertions;
-using CloudEventify.MassTransit;
 using MassTransit.Context;
 using Xunit;
 
@@ -13,33 +13,26 @@ namespace CloudEventify.MassTransit.Tests;
 public class SerializerTests
 {
     private readonly Faker<UserRegisteredEvent> _faker = new Faker<UserRegisteredEvent>().StrictMode(true);
+    private readonly CloudEventFormatter _formatter = Formatter.New(new JsonSerializerOptions());
 
     [Fact]
-    public void UseType()
+    public void Unmapped()
     {
         // Arrange
-        var serializer = new Serializer();
-        var message = _faker.Generate();
+        var serializer = Serializer(types => types);
 
         // Act
-        using var stream = new MemoryStream();
-        serializer.Serialize(stream, new MessageSendContext<UserRegisteredEvent>(message));
+        var act = () => serializer.Serialize(null!, new MessageSendContext<string>(""));
 
         // Assert
-        Deserialize(stream)
-            .Type
-            .Should()
-            .Be("UserRegisteredEvent");
+        act.Should().Throw<KeyNotFoundException>();
     }
         
     [Fact]
     public void UseMappingForType()
     {
         // Arrange
-        var serializer = new Serializer();
-        serializer
-            .AddType<UserRegisteredEvent>("registered");
-            
+        var serializer = Serializer(types => types.Map<UserRegisteredEvent>("registered"));
         var message = _faker.Generate();
 
         // Act
@@ -57,7 +50,7 @@ public class SerializerTests
     public void UseSourceAddress()
     {
         // Arrange
-        var serializer = new Serializer();
+        var serializer = Serializer(types => types.Map<UserRegisteredEvent>("asdf"));
         var message = _faker.Generate();
 
         // Act
@@ -79,12 +72,12 @@ public class SerializerTests
     public void UseSentTime()
     {
         // Arrange
-        var serializer = new Serializer();
         var message = _faker.Generate();
         var context = new MessageSendContext<UserRegisteredEvent>(message);
 
         // Act
         using var stream = new MemoryStream();
+        var serializer = Serializer(types => types.Map<UserRegisteredEvent>("asdf"));
         serializer.Serialize(stream, context);
 
         // Assert
@@ -95,6 +88,8 @@ public class SerializerTests
             .And
             .Be(context.SentTime);
     }
+
+    private Serializer Serializer(Func<ITypesMap, ITypesMap> map) => new(null!, _formatter, new Wrap(map(new TypesMapper())));
 
     private static CloudEvent Deserialize(MemoryStream stream) =>
         JsonSerializer.Deserialize<CloudEvent>(stream.ToArray(), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
