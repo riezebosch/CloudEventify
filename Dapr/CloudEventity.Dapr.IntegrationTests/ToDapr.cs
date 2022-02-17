@@ -38,9 +38,13 @@ public class ToDapr
         await hypothesis.Validate(10.Seconds());
     }
 
-    private async Task Publish(UserLoggedIn message)
+    private static async Task Publish(UserLoggedIn message)
     {
-        var client = new DaprClient("http://localhost:3001");
+        using var client = CloudEventClientBuilder
+            .For("http://localhost:3001")
+            .WithTypes(types => types.Map<UserLoggedIn>("loggedIn"))
+            .Build();
+
         await client.PublishEvent("my-pubsub", "user/loggedIn", message);
     }
 

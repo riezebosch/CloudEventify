@@ -24,6 +24,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventity.Dapr", "Dapr\CloudEventity.Dapr\CloudEventity.Dapr.csproj", "{E10D5F56-4F70-4B10-A116-A11B342D42CF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventity.Dapr.IntegrationTests", "Dapr\CloudEventity.Dapr.IntegrationTests\CloudEventity.Dapr.IntegrationTests.csproj", "{2B00DCB8-9483-4597-9B24-5BE338A1D873}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventify.Rebus.IntegrationTests", "Rebus\CloudEventify.Rebus.IntegrationTests\CloudEventify.Rebus.IntegrationTests.csproj", "{D2D6EA38-194F-4DC3-BF99-7E8ADEF8A48D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Rebus", "Rebus", "{F4CDDE17-BD5E-4495-94E0-44592CCB015B}"
@@ -31,6 +32,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventify.Rebus", "Rebus\CloudEventify.Rebus\CloudEventify.Rebus.csproj", "{186CAC6F-3AD8-4D9F-AD3D-81E4BF8828A2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventity.Rebus.Tests", "Rebus\CloudEventity.Rebus.Tests\CloudEventity.Rebus.Tests.csproj", "{05FCC259-5E44-4B2A-9901-DF7B116095C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventify", "CloudEventify\CloudEventify.csproj", "{6E57FD1F-2509-4E71-AE76-A9D919A77F27}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -78,6 +81,10 @@ Global
 		{05FCC259-5E44-4B2A-9901-DF7B116095C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05FCC259-5E44-4B2A-9901-DF7B116095C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05FCC259-5E44-4B2A-9901-DF7B116095C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E57FD1F-2509-4E71-AE76-A9D919A77F27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E57FD1F-2509-4E71-AE76-A9D919A77F27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E57FD1F-2509-4E71-AE76-A9D919A77F27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E57FD1F-2509-4E71-AE76-A9D919A77F27}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D2D6EA38-194F-4DC3-BF99-7E8ADEF8A48D} = {F4CDDE17-BD5E-4495-94E0-44592CCB015B}

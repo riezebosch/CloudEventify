@@ -37,7 +37,8 @@ public class UseCloudEvents : IClassFixture<RabbitMqContainer>
             {
                 cfg.Host(_container.ConnectionString);
                 cfg.UseCloudEvents()
-                    .WithContentType(new ContentType("text/plain"));
+                    .WithContentType(new ContentType("text/plain"))
+                    .WithTypes(t => t.Map<Request>("request").Map<Reply>("reply"));
                 
                 cfg.ReceiveEndpoint("a", e => e.Handler<Request>(m => m.Publish(new Reply(m.Message.UserId))));
                     

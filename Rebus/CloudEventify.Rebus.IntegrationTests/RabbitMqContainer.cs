@@ -1,5 +1,4 @@
 using System;
-using Ductus.FluentDocker.Builders;
 using Ductus.FluentDocker.Services;
 using Ductus.FluentDocker.Services.Extensions;
 using FluentAssertions.Extensions;
@@ -11,7 +10,7 @@ public sealed class RabbitMqContainer : IDisposable
     private readonly IContainerService _container;
 
     public RabbitMqContainer() =>
-        _container = new Builder()
+        _container = new Ductus.FluentDocker.Builders.Builder()
             .UseContainer()
             .UseImage("rabbitmq:alpine")
             .ExposePort(8395, 5672)

@@ -1,7 +1,7 @@
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Bogus;
-using Dapr.Client;
+using CloudEventity.Dapr;
 using FluentAssertions.Extensions;
 using Hypothesist;
 using MassTransit;
@@ -40,7 +40,8 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
             {
                 cfg.Host(_container.ConnectionString);
                 cfg.UseCloudEvents()
-                    .WithContentType(new ContentType("text/plain"));
+                    .WithContentType(new ContentType("text/plain"))
+                    .WithTypes(t => t.Map<UserLoggedIn>("user.loggedIn"));
                     
                 cfg.ReceiveEndpoint("user:loggedIn:test", e =>
                 {
@@ -78,7 +79,8 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
                 cfg.ReceiveEndpoint("user:loggedIn:test:local-config", x =>
                 {
                     x.UseCloudEvents()
-                        .WithContentType(new ContentType("text/plain"));
+                        .WithContentType(new ContentType("text/plain"))
+                        .WithTypes(types => types.Map<UserLoggedIn>("user.loggedIn"));
                     x.Consumer(hypothesis.AsConsumer);
                     x.Bind("user/loggedIn");
                 });
@@ -102,11 +104,12 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
             .ComponentsPath("components")
             .DaprGrpcPort(3001));
 
-        using var client = new DaprClientBuilder()
-            .UseGrpcEndpoint("http://localhost:3001")
-            .Build();
-
-        await client.PublishEventAsync("my-pubsub", "user/loggedIn", message);
+        using var client = CloudEventClientBuilder
+            .For("http://localhost:3001")
+            .WithTypes(types => types.Map<UserLoggedIn>("user.loggedIn"))
+            .Build(); 
+        
+        await client.PublishEvent("my-pubsub", "user/loggedIn", message);
     }
 
     public record UserLoggedIn(string Id);

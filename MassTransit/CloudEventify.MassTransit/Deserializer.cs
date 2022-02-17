@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
-using System.Text.Json;
 using CloudNative.CloudEvents;
-using CloudNative.CloudEvents.SystemTextJson;
 using GreenPipes;
 using MassTransit;
 using MassTransit.Context;
@@ -13,45 +11,37 @@ namespace CloudEventify.MassTransit;
 
 public class Deserializer : IMessageDeserializer
 {
-    private readonly Dictionary<string, Type> _types = new ();
+    private readonly CloudEventFormatter _formatter;
+    private readonly Unwrap _unwrap;
+
+    public Deserializer(ContentType contentType, CloudEventFormatter formatter, Unwrap unwrap)
+    {
+        _formatter = formatter;
+        _unwrap = unwrap;
+        ContentType = contentType;
+    }
 
     void IProbeSite.Probe(ProbeContext context)
     {
     }
 
-    ConsumeContext IMessageDeserializer.Deserialize(ReceiveContext receiveContext)
-    {
-        var formatter = new JsonEventFormatter();
-        var message = formatter.DecodeStructuredModeMessage((ReadOnlyMemory<byte>)receiveContext.GetBody(), null, null);
-
-        return new CloudEventContext(receiveContext, message, _types, Options);
-    }
+    ConsumeContext IMessageDeserializer.Deserialize(ReceiveContext receiveContext) => 
+        new CloudEventContext(receiveContext, _formatter.Decode(receiveContext.GetBody()), _unwrap);
 
     public ContentType ContentType
     {
         get;
-        set; 
-    } = new ("application/cloudevents+json");
-
-    public JsonSerializerOptions Options { get; } = new() { PropertyNameCaseInsensitive = true };
-
-
-    public void AddType<T>(string type) => 
-        _types[type] = typeof(T);
+    }
 
     private class CloudEventContext : DeserializerConsumeContext
     {
         private readonly CloudEvent _cloudEvent;
-        private readonly Dictionary<string, Type> _mappings;
-        private readonly JsonSerializerOptions _options;
+        private readonly Unwrap _unwrap;
 
-        public CloudEventContext(ReceiveContext receiveContext, CloudEvent cloudEvent,
-            Dictionary<string, Type> mappings, JsonSerializerOptions options) 
-            : base(receiveContext)
+        public CloudEventContext(ReceiveContext receiveContext, CloudEvent cloudEvent, Unwrap unwrap) : base(receiveContext)
         {
             _cloudEvent = cloudEvent;
-            _mappings = mappings;
-            _options = options;
+            _unwrap = unwrap;
         }
 
         public override bool HasMessageType(Type messageType) =>
@@ -61,11 +51,10 @@ public class Deserializer : IMessageDeserializer
         {
             try
             {
-                var message = _cloudEvent.ToObject<T>(Type<T>(), _options);
-                consumeContext = new MessageConsumeContext<T>(this, message);
+                consumeContext = new MessageConsumeContext<T>(this, (T)_unwrap.Envelope(_cloudEvent));
                 return true;
             }
-            catch (NotSupportedException)
+            catch (KeyNotFoundException)
             {
                 consumeContext = null;
                 return false;
@@ -73,22 +62,18 @@ public class Deserializer : IMessageDeserializer
         }
 
         public override Guid? MessageId => Guid.TryParse(_cloudEvent.Id, out var result) ? result : null;
-        public override Guid? RequestId { get; }
-        public override Guid? CorrelationId { get; }
-        public override Guid? ConversationId { get; }
-        public override Guid? InitiatorId { get; }
-        public override DateTime? ExpirationTime { get; }
+        public override Guid? RequestId => null;
+        public override Guid? CorrelationId => null;
+        public override Guid? ConversationId => null;
+        public override Guid? InitiatorId => null;
+        public override DateTime? ExpirationTime => null;
         public override Uri? SourceAddress => _cloudEvent.Source;
-        public override Uri? DestinationAddress { get; }
-        public override Uri? ResponseAddress { get; }
-        public override Uri? FaultAddress { get; }
+        public override Uri? DestinationAddress => null;
+        public override Uri? ResponseAddress => null;
+        public override Uri? FaultAddress => null;
         public override DateTime? SentTime => _cloudEvent.Time?.DateTime;
         public override Headers Headers { get; } = new DictionarySendHeaders(new Dictionary<string, object>());
-        
         public override HostInfo? Host { get; }
         public override IEnumerable<string> SupportedMessageTypes { get; } = Enumerable.Empty<string>();
-
-        private Type Type<T>() => 
-            _mappings.TryGetValue(_cloudEvent.Type!, out var result) ? result : typeof(T);
     }
 }
