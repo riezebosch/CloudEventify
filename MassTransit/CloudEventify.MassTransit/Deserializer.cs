@@ -83,7 +83,8 @@ public class Deserializer : IMessageDeserializer
         public override Uri? ResponseAddress { get; }
         public override Uri? FaultAddress { get; }
         public override DateTime? SentTime => _cloudEvent.Time?.DateTime;
-        public override Headers? Headers { get; } 
+        public override Headers Headers { get; } = new DictionarySendHeaders(new Dictionary<string, object>());
+        
         public override HostInfo? Host { get; }
         public override IEnumerable<string> SupportedMessageTypes { get; } = Enumerable.Empty<string>();
 

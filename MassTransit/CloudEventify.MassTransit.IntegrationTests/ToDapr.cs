@@ -15,7 +15,7 @@ using Xunit.Abstractions;
 
 namespace CloudEventify.MassTransit.IntegrationTests;
 
-[Collection("user/loggedIn")]
+[Collection("rabbitmq")]
 public class ToDapr : IClassFixture<RabbitMqContainer>
 {
     private readonly ITestOutputHelper _output;

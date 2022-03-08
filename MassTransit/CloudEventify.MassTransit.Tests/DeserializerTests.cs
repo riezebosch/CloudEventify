@@ -50,7 +50,7 @@ public class DeserializerTests
                 DestinationAddress = (Uri)null,
                 ResponseAddress = (Uri)null,
                 FaultAddress = (Uri)null,
-                Headers = (Headers)null,
+                Headers = new DictionarySendHeaders(new Dictionary<string, object>()),
                 Host = (HostInfo)null,
                 SupportedMessageTypes = Enumerable.Empty<string>()
             });
