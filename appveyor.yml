@@ -1,11 +1,11 @@
-version: 1.2.{build}
+version: 1.3.{build}
 pull_requests:
   do_not_increment_build_number: true
 image: Ubuntu2004
 configuration: Release
 only_commits:
   files:
-    - MassTransit.CloudEvents/**/*
+    - MassTransit/CloudEventify.MassTransit/**/*
     - appveyor.yml
 dotnet_csproj:
   patch: true
@@ -22,7 +22,6 @@ before_test:
   - docker login -u mriezebosch -p $DOCKER_TOKEN
   - sudo wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O - | /bin/bash
   - dapr init --slim
-  - docker run -d --hostname my-rabbit --name some-rabbit -p 5672:5672 rabbitmq:alpine
 after_test:
   - dotnet tool restore && cd MassTransit.CloudEvents.Tests && dotnet stryker -r "['cleartext']"
 test_script:
@@ -42,7 +41,7 @@ for:
         secure: hjq8RYRkP5jADqnQGO67HK3reNedik0E/M7x67bvWfOmnljS9kIiqiAgvCbn4xL6
     after_test:
       - bash <(curl -s https://codecov.io/bash)
-      - dotnet tool restore && cd MassTransit.CloudEvents.Tests && dotnet stryker -r "['dashboard']" --dashboard-api-key $STRYKER_DASHBOARD_API_KEY --dashboard-project github.com/riezebosch/MassTransit.CloudEvents/main
+      - dotnet tool restore && cd MassTransit/CloudEventify.MassTransit.Tests && dotnet dotnet-stryker --reporter dashboard --dashboard-api-key $STRYKER_DASHBOARD_API_KEY -c 4
     deploy:
       - provider: NuGet
         api_key:
