@@ -10,12 +10,20 @@ internal class Builder : CloudEvents
         .Map<SubscribeRequest>("subscribe");
 
     private readonly JsonSerializerOptions _options = new();
+    private Uri _source = new("cloudeventify:rebus");
+
     public ISerializer New() => 
-        new Serializer(Formatter.New(_options), new Wrap(_mapper), new Unwrap(_mapper, _options));
+        new Serializer(Formatter.New(_options), new Wrap(_mapper, _source), new Unwrap(_mapper, _options));
 
     CloudEvents JsonOptions<CloudEvents>.WithJsonOptions(Action<JsonSerializerOptions> options)
     {
         options(_options);
+        return this;
+    }
+
+    CloudEvents CloudEvents.WithSource(Uri source)
+    {
+        _source = source;
         return this;
     }
 
