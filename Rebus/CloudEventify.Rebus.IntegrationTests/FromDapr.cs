@@ -10,7 +10,7 @@ using Rebus.Config;
 using Wrapr;
 using Xunit;
 using Xunit.Abstractions;
-using CloudEventity.Dapr;
+using CloudEventify.Dapr;
 
 namespace CloudEventify.Rebus.IntegrationTests;
 

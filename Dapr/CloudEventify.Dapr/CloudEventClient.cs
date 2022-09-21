@@ -1,10 +1,9 @@
-using CloudEventify;
 using CloudNative.CloudEvents;
 using Dapr.Client.Autogen.Grpc.v1;
 using Google.Protobuf;
 using Grpc.Net.Client;
 
-namespace CloudEventity.Dapr;
+namespace CloudEventify.Dapr;
 
 internal sealed class CloudEventClient : ICloudEventClient
 {

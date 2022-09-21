@@ -1,7 +1,6 @@
-using CloudEventify;
 using CloudNative.CloudEvents;
 
-namespace CloudEventity.Dapr;
+namespace CloudEventify.Dapr;
 
 internal class Wrap
 {

@@ -29,7 +29,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\CloudEventify\CloudEventify.csproj" />
       <ProjectReference Include="..\..\DaprApp\DaprApp.csproj" />
-      <ProjectReference Include="..\..\Dapr\CloudEventity.Dapr\CloudEventity.Dapr.csproj" />
+      <ProjectReference Include="..\..\Dapr\CloudEventify.Dapr\CloudEventify.Dapr.csproj" />
       <ProjectReference Include="..\CloudEventify.MassTransit\CloudEventify.MassTransit.csproj" />
     </ItemGroup>
 

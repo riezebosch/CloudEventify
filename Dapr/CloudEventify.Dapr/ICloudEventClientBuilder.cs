@@ -1,6 +1,4 @@
-using CloudEventify;
-
-namespace CloudEventity.Dapr;
+namespace CloudEventify.Dapr;
 
 public interface ICloudEventClientBuilder : IConfigure<ICloudEventClientBuilder>
 {

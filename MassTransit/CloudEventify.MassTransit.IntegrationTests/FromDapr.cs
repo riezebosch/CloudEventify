@@ -1,7 +1,7 @@
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Bogus;
-using CloudEventity.Dapr;
+using CloudEventify.Dapr;
 using FluentAssertions.Extensions;
 using Hypothesist;
 using MassTransit;

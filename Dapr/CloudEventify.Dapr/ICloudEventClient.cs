@@ -1,4 +1,4 @@
-namespace CloudEventity.Dapr;
+namespace CloudEventify.Dapr;
 
 public interface ICloudEventClient : IDisposable
 {

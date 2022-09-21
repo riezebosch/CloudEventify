@@ -1,8 +1,7 @@
 using System.Text.Json;
-using CloudEventify;
 using Grpc.Net.Client;
 
-namespace CloudEventity.Dapr;
+namespace CloudEventify.Dapr;
 
 public class CloudEventClientBuilder : ICloudEventClientBuilder
 {

@@ -21,9 +21,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MassTransit", "MassTransit"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dapr", "Dapr", "{6E3F98B2-0CDF-48BC-BAD2-682159E631D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventity.Dapr", "Dapr\CloudEventity.Dapr\CloudEventity.Dapr.csproj", "{E10D5F56-4F70-4B10-A116-A11B342D42CF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventify.Dapr", "Dapr\CloudEventify.Dapr\CloudEventify.Dapr.csproj", "{E10D5F56-4F70-4B10-A116-A11B342D42CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventity.Dapr.IntegrationTests", "Dapr\CloudEventity.Dapr.IntegrationTests\CloudEventity.Dapr.IntegrationTests.csproj", "{2B00DCB8-9483-4597-9B24-5BE338A1D873}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventify.Dapr.IntegrationTests", "Dapr\CloudEventify.Dapr.IntegrationTests\CloudEventify.Dapr.IntegrationTests.csproj", "{2B00DCB8-9483-4597-9B24-5BE338A1D873}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventify.Rebus.IntegrationTests", "Rebus\CloudEventify.Rebus.IntegrationTests\CloudEventify.Rebus.IntegrationTests.csproj", "{D2D6EA38-194F-4DC3-BF99-7E8ADEF8A48D}"
 EndProject

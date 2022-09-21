@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using DaprApp.Controllers;
 using Hypothesist;
 
-namespace CloudEventity.Dapr.IntegrationTests;
+namespace CloudEventify.Dapr.IntegrationTests;
 
 internal static class TestHandler
 {

@@ -10,7 +10,7 @@ using Wrapr;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace CloudEventity.Dapr.IntegrationTests;
+namespace CloudEventify.Dapr.IntegrationTests;
 
 public class ToDapr
 {
