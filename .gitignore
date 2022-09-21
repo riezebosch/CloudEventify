@@ -8,3 +8,4 @@ riderModule.iml
 *.user
 StrykerOutput/
 reports/
+.vs

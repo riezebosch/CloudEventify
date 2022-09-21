@@ -19,9 +19,10 @@ public class Wrap
         new(CloudEventsSpecVersion.V1_0)
         {
             Id = message.GetMessageId(),
+            Subject = _mapper[message.Body.GetType()].FormatSubject(message.Body),
             Source = _source,
             Data = message.Body,
             Time = DateTimeOffset.Parse(message.Headers[Headers.SentTime]),
-            Type = _mapper[message.Body.GetType()]
+            Type = _mapper[message.Body.GetType()].TypeName
         };
 }
