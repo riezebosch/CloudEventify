@@ -6,9 +6,3 @@ public interface ITypesMap : IMap<Type, ITypeMap>, IMap<string, Type>
     ITypesMap WithFormatSubject<T>(Func<T, string> formatSubject);
 }
 
-public interface ITypeMap
-{
-    string TypeName { get; }
-    Func<object, string> FormatSubject { get; }
-    ITypeMap WithFormatSubject<T>(Func<T, string> formatSubject);
-}

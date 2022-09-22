@@ -13,30 +13,27 @@ namespace CloudEventity.Rebus.Tests
         public void EnvelopeWithFormattedSubjectFromObject()
         {
             var data = SomeDataObject.GetRandom();
-            var fact = (SomeDataObject obj) => { return $"event/{obj.Id}"; };
-            var sut = new Wrap(new TypesMapper().Map<SomeDataObject>("PrettyObject").WithFormatSubject(fact), new Uri("test:uri"));
+            var sut = new Wrap(new TypesMapper().Map<SomeDataObject>("PrettyObject").WithFormatSubject((SomeDataObject obj) => { return $"event/{obj.Id}"; }), new Uri("test:uri"));
             var res = sut.Envelope(new Message(
                 new Dictionary<string, string> {
                     { "rbs2-msg-id", Guid.NewGuid().ToString() },
                     { "rbs2-senttime", DateTime.UtcNow.ToString() }
                 }, data));
             Assert.NotNull(res);
-            Assert.Equal(fact(data), res.Subject);
+            Assert.Equal($"event/{data.Id}", res.Subject);
         }
 
         [Fact]
         public void EnvelopeWithFormattedSubject()
         {
-            var data = "somestringdata";
-            var fact = (string obj) => { return $"event/{obj}"; };
-            var sut = new Wrap(new TypesMapper().Map<string>("my-custom-event").WithFormatSubject<string>(fact), new Uri("test:uri"));
+            var sut = new Wrap(new TypesMapper().Map<string>("my-custom-event").WithFormatSubject<string>((string obj) => { return $"event/{obj}"; }), new Uri("test:uri"));
             var res = sut.Envelope(new Message(
                 new Dictionary<string, string> {
                     { "rbs2-msg-id", Guid.NewGuid().ToString() },
                     { "rbs2-senttime", DateTime.UtcNow.ToString() }
-                }, data));
+                }, "somestringdata"));
             Assert.NotNull(res);
-            Assert.Equal(fact(data), res.Subject);
+            Assert.Equal("event/somestringdata", res.Subject);
         }
 
         [Fact]
@@ -125,7 +122,7 @@ namespace CloudEventity.Rebus.Tests
                         { "rbs2-senttime", new DateTimeOffset(2007, 10, 31, 21, 0, 0, new TimeSpan(-8, 0, 0)).ToString() }
             }, SomeDataObject.GetRandom()));
             Assert.NotNull(res.Type);
-            Assert.Equal(fact[res.Data!.GetType()].TypeName, res.Type);
+            Assert.Equal(fact[res.Data!.GetType()].Type, res.Type);
         }
 
     }

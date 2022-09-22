@@ -1,22 +1,5 @@
 namespace CloudEventify;
 
-public class TypeMap : ITypeMap
-{
-    public string TypeName { get; private set; }
-    public Func<object, string> FormatSubject { get; private set; } = (a) => default;
-
-    public TypeMap(string typeName)
-    {
-        TypeName = typeName;
-    }
-
-    public ITypeMap WithFormatSubject<T>(Func<T, string> formatSubject)
-    {
-        FormatSubject = new Func<object, string>(obj => formatSubject((T)obj));
-        return this;
-    }
-}
-
 public class TypesMapper : ITypesMap
 {
     private readonly Dictionary<string, Type> _from = new();
@@ -37,6 +20,4 @@ public class TypesMapper : ITypesMap
 
     public Type this[string type] => _from[type];
     public ITypeMap this[Type type] => _to[type];
-    public bool Has(Type type) => _to.ContainsKey(type);
-    public bool Has(string type) => _from.ContainsKey(type);
 }

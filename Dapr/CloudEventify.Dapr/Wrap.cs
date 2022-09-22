@@ -13,6 +13,6 @@ internal class Wrap
         new(message)
         {
             Source = new Uri("cloudeventify:dapr"),
-            Type = _mapper[message.GetType()].TypeName
+            Type = _mapper[message.GetType()].Type
         };
 }

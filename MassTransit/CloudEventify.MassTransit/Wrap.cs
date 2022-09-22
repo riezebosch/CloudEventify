@@ -18,6 +18,6 @@ public class Wrap
             Source = context.SourceAddress ?? new Uri("cloudeventify:masstransit"),
             Data = context.Message,
             Time = context.SentTime,
-            Type = _map[typeof(T)].TypeName
+            Type = _map[typeof(T)].Type
         };
 }
