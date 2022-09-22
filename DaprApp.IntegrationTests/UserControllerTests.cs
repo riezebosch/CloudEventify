@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Dapr;
 using Dapr.Client;
 using FluentAssertions.Extensions;
 using Hypothesist;
@@ -80,6 +81,8 @@ public class UserControllerTests
             .Build();
 
         await client
-            .PublishEventAsync("my-pubsub", "user/loggedIn", new { UserId = 1234 });
+            .PublishEventAsync("my-pubsub", "user/loggedIn",  new CloudEvent<Data>(new Data(1234)) { Type = "loggedIn"});
     }
 }
+
+internal record Data(int UserId);
