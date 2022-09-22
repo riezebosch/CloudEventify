@@ -4,7 +4,7 @@ namespace CloudEventify.MassTransit;
 
 public static class Factory
 {
-    public static ICloudEvents UseCloudEvents(this IBusFactoryConfigurator cfg)
+    public static CloudEvents UseCloudEvents(this IBusFactoryConfigurator cfg)
     {
         var builder = new Builder();
         cfg.AddMessageDeserializer(builder.ContentType, () => builder.Deserializer());
@@ -13,7 +13,7 @@ public static class Factory
         return builder;
     }
 
-    public static ICloudEvents UseCloudEvents(this IReceiveEndpointConfigurator cfg)
+    public static CloudEvents UseCloudEvents(this IReceiveEndpointConfigurator cfg)
     {
         var builder = new Builder();
         cfg.AddMessageDeserializer(builder.ContentType, () => builder.Deserializer());

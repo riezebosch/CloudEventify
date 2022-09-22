@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Dapr.Client;
 using DaprApp;
 using DaprApp.Controllers;
 using FluentAssertions.Extensions;
@@ -40,12 +41,13 @@ public class ToDapr
 
     private static async Task Publish(UserLoggedIn message)
     {
-        using var client = CloudEventClientBuilder
-            .For("http://localhost:3001")
+        using var client = new DaprClientBuilder()
+            .UseGrpcEndpoint("http://localhost:3001")
+            .UseCloudEvents()
             .WithTypes(types => types.Map<UserLoggedIn>("loggedIn"))
             .Build();
 
-        await client.PublishEvent("my-pubsub", "user/loggedIn", message);
+        await client.PublishEventAsync("my-pubsub", "user/loggedIn", message);
     }
 
 

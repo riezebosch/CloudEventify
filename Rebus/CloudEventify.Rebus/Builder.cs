@@ -4,7 +4,7 @@ using Rebus.Serialization;
 
 namespace CloudEventify.Rebus;
 
-internal class Builder : ICloudEvents
+internal class Builder : CloudEvents
 {
     private readonly ITypesMap _mapper = new TypesMapper()
         .Map<SubscribeRequest>("subscribe");
@@ -13,13 +13,13 @@ internal class Builder : ICloudEvents
     public ISerializer New() => 
         new Serializer(Formatter.New(_options), new Wrap(_mapper), new Unwrap(_mapper, _options));
 
-    ICloudEvents IConfigure<ICloudEvents>.WithJsonOptions(Action<JsonSerializerOptions> options)
+    CloudEvents JsonOptions<CloudEvents>.WithJsonOptions(Action<JsonSerializerOptions> options)
     {
         options(_options);
         return this;
     }
 
-    ICloudEvents IConfigure<ICloudEvents>.WithTypes(Func<ITypesMap, ITypesMap> map)
+    CloudEvents Types<CloudEvents>.WithTypes(Func<ITypesMap, ITypesMap> map)
     {
         map(_mapper);
         return this;

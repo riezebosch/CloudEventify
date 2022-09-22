@@ -1,4 +1,4 @@
-using CloudNative.CloudEvents;
+using Dapr;
 
 namespace CloudEventify.Dapr;
 
@@ -9,13 +9,10 @@ internal class Wrap
     public Wrap(ITypesMap mapper) =>
         _mapper = mapper;
 
-    public CloudEvent Envelope(object message) =>
-        new(CloudEventsSpecVersion.V1_0)
+    public CloudEvent<T> Envelope<T>(T message) =>
+        new(message)
         {
-            Id = Guid.NewGuid().ToString(),
             Source = new Uri("cloudeventify:dapr"),
-            Data = message,
-            Time = DateTimeOffset.Now,
             Type = _mapper[message.GetType()]
         };
 }

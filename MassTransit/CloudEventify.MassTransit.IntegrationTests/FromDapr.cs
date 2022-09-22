@@ -2,6 +2,7 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using Bogus;
 using CloudEventify.Dapr;
+using Dapr.Client;
 using FluentAssertions.Extensions;
 using Hypothesist;
 using MassTransit;
@@ -104,12 +105,13 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
             .ComponentsPath("components")
             .DaprGrpcPort(3001));
 
-        using var client = CloudEventClientBuilder
-            .For("http://localhost:3001")
+        using var client = new DaprClientBuilder()
+            .UseGrpcEndpoint("http://localhost:3001")
+            .UseCloudEvents()
             .WithTypes(types => types.Map<UserLoggedIn>("user.loggedIn"))
             .Build(); 
         
-        await client.PublishEvent("my-pubsub", "user/loggedIn", message);
+        await client.PublishEventAsync("my-pubsub", "user/loggedIn", message);
     }
 
     public record UserLoggedIn(string Id);

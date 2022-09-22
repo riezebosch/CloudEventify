@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Bogus;
+using CloudEventify.Dapr;
 using FluentAssertions.Extensions;
 using Hypothesist;
 using Hypothesist.Rebus;
@@ -10,7 +11,8 @@ using Rebus.Config;
 using Wrapr;
 using Xunit;
 using Xunit.Abstractions;
-using CloudEventify.Dapr;
+using Dapr.Client;
+using Configure = Rebus.Config.Configure;
 
 namespace CloudEventify.Rebus.IntegrationTests;
 
@@ -43,7 +45,8 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
         var subscriber = Configure.With(activator)
             .Transport(t => t.UseRabbitMq(_container.ConnectionString, queue))
             .Serialization(s => s.UseCloudEvents()
-                .WithTypes(t => t.Map<UserLoggedIn>("loggedIn")))
+                .WithTypes(t => t.Map<UserLoggedIn>("loggedIn"))
+                .WithJsonOptions(options => options.PropertyNameCaseInsensitive = true))
             .Logging(l => l.MicrosoftExtensionsLogging(_output.ToLoggerFactory()))
             .Start();
         await subscriber.Subscribe<UserLoggedIn>();
@@ -77,13 +80,14 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
             .ComponentsPath("components")
             .DaprGrpcPort(3201));
 
-        using var client = CloudEventClientBuilder
-            .For("http://localhost:3201")
+        using var client = new DaprClientBuilder()
+            .UseGrpcEndpoint("http://localhost:3201")
+            .UseCloudEvents()
             .WithTypes(types => types.Map<UserLoggedIn>("loggedIn"))
             .Build();
         
         await client
-            .PublishEvent("my-pubsub", topic, message);
+            .PublishEventAsync("my-pubsub", topic, message);
     }
 
     public record UserLoggedIn(string Id);

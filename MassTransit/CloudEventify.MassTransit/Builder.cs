@@ -5,27 +5,27 @@ using MassTransit;
 
 namespace CloudEventify.MassTransit;
 
-internal class Builder : ICloudEvents
+internal class Builder : CloudEvents
 {
     private readonly ITypesMap _mapper = new TypesMapper();
     private readonly JsonSerializerOptions _options = new() { PropertyNameCaseInsensitive = true };
     public ContentType ContentType { get; private set; } = new("application/cloudevents+json");
 
 
-    ICloudEvents ICloudEvents.WithContentType(ContentType contentType)
+    CloudEvents CloudEvents.WithContentType(ContentType contentType)
     {
         ContentType = contentType;
         return this;
     }
 
 
-    ICloudEvents IConfigure<ICloudEvents>.WithJsonOptions(Action<JsonSerializerOptions> options)
+    CloudEvents JsonOptions<CloudEvents>.WithJsonOptions(Action<JsonSerializerOptions> options)
     {
         options(_options);
         return this;
     }
 
-    ICloudEvents IConfigure<ICloudEvents>.WithTypes(Func<ITypesMap, ITypesMap> map)
+    CloudEvents Types<CloudEvents>.WithTypes(Func<ITypesMap, ITypesMap> map)
     {
         map(_mapper);
         return this;
