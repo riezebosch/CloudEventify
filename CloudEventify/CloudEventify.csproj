@@ -5,7 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
-        <IsPackable>false</IsPackable>
+        <IsPackable>true</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,4 +14,21 @@
       <PackageReference Include="System.Text.Json" Version="6.0.6" />
     </ItemGroup>
 
+    <PropertyGroup>
+        <Authors>Manuel Riezebosch</Authors>
+        <NeutralLanguage>en-US</NeutralLanguage>
+        <PackageId>CloudEventify</PackageId>
+        <Description>Use cloud events for pub/sub with major frameworks.</Description>
+        <PackageReleaseNotes></PackageReleaseNotes>
+        <PackageTags>cloudevents;cloud;events;rebus;masstransit</PackageTags>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/riezebosch/CloudEventify.git</RepositoryUrl>
+        <Version>0.0.1</Version>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\README.md" Pack="true" PackagePath="" />
+    </ItemGroup>
 </Project>
