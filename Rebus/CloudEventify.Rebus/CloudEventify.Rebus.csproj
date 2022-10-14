@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>netstandard2.1</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <LangVersion>Latest</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -19,7 +20,7 @@
         <NeutralLanguage>en-US</NeutralLanguage>
         <PackageId>CloudEventify.Rebus</PackageId>
         <Description>Use cloud events for pub/sub with Rebus.</Description>
-        <PackageReleaseNotes></PackageReleaseNotes>
+        <PackageReleaseNotes>netstandard2.1</PackageReleaseNotes>
         <PackageTags>cloudevents;cloud;events;rebus</PackageTags>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <PackageReadmeFile>README.md</PackageReadmeFile>
