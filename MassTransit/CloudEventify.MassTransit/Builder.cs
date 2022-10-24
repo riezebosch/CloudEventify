@@ -5,20 +5,20 @@ using MassTransit;
 
 namespace CloudEventify.MassTransit;
 
-internal class Builder : CloudEvents
+internal class Builder : CloudEvents, ISerializerFactory
 {
     private readonly ITypesMap _mapper = new TypesMapper();
+    
     private readonly JsonSerializerOptions _options = new() { PropertyNameCaseInsensitive = true };
-    public ContentType ContentType { get; private set; } = new("application/cloudevents+json");
 
+    IMessageSerializer ISerializerFactory.CreateSerializer() => 
+        new Serializer(ContentType, Formatter.New(_options), new Wrap(_mapper));
 
-    CloudEvents CloudEvents.WithContentType(ContentType contentType)
-    {
-        ContentType = contentType;
-        return this;
-    }
+    IMessageDeserializer ISerializerFactory.CreateDeserializer() => 
+        new Deserializer(ContentType, Formatter.New(_options), new Unwrap(_mapper, _options), this);
 
-
+    public ContentType ContentType { get; } = new("application/cloudevents+json");
+    
     CloudEvents JsonOptions<CloudEvents>.WithJsonOptions(Action<JsonSerializerOptions> options)
     {
         options(_options);
@@ -30,10 +30,4 @@ internal class Builder : CloudEvents
         map(_mapper);
         return this;
     }
-
-    public IMessageDeserializer Deserializer() => 
-        new Deserializer(ContentType, Formatter.New(_options), new Unwrap(_mapper, _options));
-
-    public IMessageSerializer Serializer() => 
-        new Serializer(ContentType, Formatter.New(_options), new Wrap(_mapper));
 }

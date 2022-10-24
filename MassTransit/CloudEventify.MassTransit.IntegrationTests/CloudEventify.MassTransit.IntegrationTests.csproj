@@ -11,7 +11,8 @@
         <PackageReference Include="FluentAssertions" Version="6.5.1" />
         <PackageReference Include="Hypothesist.MassTransit" Version="2.0.30" />
         <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.2.0" />
-        <PackageReference Include="MassTransit.RabbitMQ" Version="7.2.2" />
+        <PackageReference Include="MassTransit.Quartz" Version="8.0.7" />
+        <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.7" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.2" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
         <PackageReference Include="Wrapr" Version="1.0.16" />

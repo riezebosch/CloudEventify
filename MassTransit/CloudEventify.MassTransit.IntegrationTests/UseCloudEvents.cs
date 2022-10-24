@@ -1,10 +1,8 @@
-using System.Net.Mime;
 using System.Threading.Tasks;
 using Bogus;
 using FluentAssertions.Extensions;
 using Hypothesist;
 using MassTransit;
-using MassTransit.Context;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -37,14 +35,16 @@ public class UseCloudEvents : IClassFixture<RabbitMqContainer>
             {
                 cfg.Host(_container.ConnectionString);
                 cfg.UseCloudEvents()
-                    .WithContentType(new ContentType("text/plain"))
-                    .WithTypes(t => t.Map<Request>("request").Map<Reply>("reply"));
+                    .WithTypes(t => t
+                        .Map<Request>("request")
+                        .Map<Reply>("reply"));
                 
-                cfg.ReceiveEndpoint("a", e => e.Handler<Request>(m => m.Publish(new Reply(m.Message.UserId))));
+                cfg.ReceiveEndpoint("a", e => 
+                    e.Handler<Request>(m => m.Publish(new Reply(m.Message.UserId))));
                     
                 cfg.ReceiveEndpoint("user:loggedIn:test", e =>
                 {
-                    e.Consumer(hypothesis.AsConsumer);
+                    e.Handler<Reply>(x => hypothesis.Test(x.Message));
                     e.Bind("user/loggedIn");
                 });
             });

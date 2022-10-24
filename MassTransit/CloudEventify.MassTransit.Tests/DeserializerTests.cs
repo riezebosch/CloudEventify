@@ -6,11 +6,10 @@ using CloudNative.CloudEvents;
 using FluentAssertions;
 using MassTransit;
 using MassTransit.Context;
-using MassTransit.Topology.EntityNameFormatters;
-using MassTransit.Topology.Topologies;
-using MassTransit.Transports.InMemory.Configuration;
-using MassTransit.Transports.InMemory.Contexts;
-using MassTransit.Transports.InMemory.Fabric;
+using MassTransit.InMemoryTransport;
+using MassTransit.InMemoryTransport.Configuration;
+using MassTransit.Serialization;
+using MassTransit.Topology;
 using Xunit;
 
 namespace CloudEventify.MassTransit.Tests;
@@ -61,7 +60,7 @@ public class DeserializerTests
     private static IMessageDeserializer Serializer(Func<ITypesMap, ITypesMap> map)
     {
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-        return new Deserializer(null!, Formatter.New(options), new Unwrap(map(new TypesMapper()), options));
+        return new Deserializer(null!, Formatter.New(options), new Unwrap(map(new TypesMapper()), options), null!);
     }
 
     [Fact]

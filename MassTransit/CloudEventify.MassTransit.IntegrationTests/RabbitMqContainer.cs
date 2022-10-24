@@ -12,7 +12,7 @@ public sealed class RabbitMqContainer : IDisposable
     public RabbitMqContainer() =>
         _container = new Builder().UseContainer()
             .UseImage("rabbitmq:alpine")
-            .ExposePort(7354, 5672)
+            .ExposePort(7354, 5672) // host port matches url in dapr components file
             .WaitForPort("5672/tcp", 30000 /*30s*/)
             .WaitForMessageInLog("Server startup complete")
             .Build()

@@ -26,7 +26,7 @@ public class UseCloudEventsTests
                 .WithJsonOptions(options => options.Converters.Add(converter));
 
             cfg.ReceiveEndpoint("test", 
-                x => x.Consumer(hypothesis.AsConsumer));
+                x => x.Handler<UserLoggedIn>(m => hypothesis.Test(m.Message)));
         });
 
         await bus.StartAsync();

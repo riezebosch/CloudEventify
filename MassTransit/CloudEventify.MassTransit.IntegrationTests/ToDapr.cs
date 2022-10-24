@@ -6,7 +6,6 @@ using FluentAssertions.Extensions;
 using Hypothesist;
 using DaprApp.Controllers;
 using MassTransit;
-using MassTransit.Context;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Wrapr;

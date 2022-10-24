@@ -1,4 +1,3 @@
-using System.IO;
 using System.Net.Mime;
 using CloudNative.CloudEvents;
 using MassTransit;
@@ -17,8 +16,8 @@ public class Serializer : IMessageSerializer
         _wrap = wrap;
     }
 
-    public void Serialize<T>(Stream stream, SendContext<T> context) where T : class => 
-        stream.Write(_formatter.Encode(_wrap.Envelope(context)));
+    MessageBody IMessageSerializer.GetMessageBody<T>(SendContext<T> context) where T : class => 
+        new ArrayMessageBody((byte[]?)_formatter.Encode(_wrap.Envelope(context)));
 
     public ContentType ContentType
     {

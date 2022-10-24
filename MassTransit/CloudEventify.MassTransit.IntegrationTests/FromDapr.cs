@@ -1,4 +1,3 @@
-using System.Net.Mime;
 using System.Threading.Tasks;
 using Bogus;
 using CloudEventify.Dapr;
@@ -6,7 +5,6 @@ using Dapr.Client;
 using FluentAssertions.Extensions;
 using Hypothesist;
 using MassTransit;
-using MassTransit.Context;
 using Wrapr;
 using Xunit;
 using Xunit.Abstractions;
@@ -41,16 +39,13 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
             {
                 cfg.Host(_container.ConnectionString);
                 cfg.UseCloudEvents()
-                    .WithContentType(new ContentType("text/plain"))
                     .WithTypes(t => t.Map<UserLoggedIn>("user.loggedIn"));
                     
                 cfg.ReceiveEndpoint("user:loggedIn:test", e =>
                 {
-                    e.Consumer(hypothesis.AsConsumer);
+                    e.Handler<UserLoggedIn>(x => hypothesis.Test(x.Message));
                     e.Bind("user/loggedIn");
                 });
-                    
-                // cfg.Message<UserLoggedIn>(x => x.SetEntityName("user/loggedIn"));
             });
 
         await bus.StartAsync();
@@ -80,13 +75,10 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
                 cfg.ReceiveEndpoint("user:loggedIn:test:local-config", x =>
                 {
                     x.UseCloudEvents()
-                        .WithContentType(new ContentType("text/plain"))
                         .WithTypes(types => types.Map<UserLoggedIn>("user.loggedIn"));
-                    x.Consumer(hypothesis.AsConsumer);
+                    x.Handler<UserLoggedIn>(m => hypothesis.Test(m.Message));
                     x.Bind("user/loggedIn");
                 });
-                
-                // cfg.Message<UserLoggedIn>(x => x.SetEntityName("user/loggedIn"));
             });
         await bus.StartAsync();
 

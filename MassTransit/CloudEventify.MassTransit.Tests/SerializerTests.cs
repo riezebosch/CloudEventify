@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text.Json;
 using Bogus;
 using CloudNative.CloudEvents;
 using FluentAssertions;
+using MassTransit;
 using MassTransit.Context;
 using Xunit;
 
@@ -22,7 +22,7 @@ public class SerializerTests
         var serializer = Serializer(types => types);
 
         // Act
-        var act = () => serializer.Serialize(null!, new MessageSendContext<string>(""));
+        var act = () => serializer.GetMessageBody(new MessageSendContext<string>(""));
 
         // Assert
         act.Should().Throw<KeyNotFoundException>();
@@ -36,11 +36,10 @@ public class SerializerTests
         var message = _faker.Generate();
 
         // Act
-        using var stream = new MemoryStream();
-        serializer.Serialize(stream, new MessageSendContext<UserRegisteredEvent>(message));
+        var body = serializer.GetMessageBody(new MessageSendContext<UserRegisteredEvent>(message));
 
         // Assert
-        Deserialize(stream)
+        Deserialize(body.GetBytes())
             .Type
             .Should()
             .Be("registered");
@@ -54,15 +53,14 @@ public class SerializerTests
         var message = _faker.Generate();
 
         // Act
-        using var stream = new MemoryStream();
         var source = new Uri("https://github.com/cloudevents");
-        serializer.Serialize(stream, new MessageSendContext<UserRegisteredEvent>(message)
+        var body = serializer.GetMessageBody(new MessageSendContext<UserRegisteredEvent>(message)
         {
             SourceAddress = source,
         });
 
         // Assert
-        Deserialize(stream)
+        Deserialize(body.GetBytes())
             .Source
             .Should()
             .Be(source);
@@ -76,12 +74,11 @@ public class SerializerTests
         var context = new MessageSendContext<UserRegisteredEvent>(message);
 
         // Act
-        using var stream = new MemoryStream();
         var serializer = Serializer(types => types.Map<UserRegisteredEvent>("asdf"));
-        serializer.Serialize(stream, context);
+        var body = serializer.GetMessageBody(context);
 
         // Assert
-        Deserialize(stream)
+        Deserialize(body.GetBytes())
             .Time
             .Should()
             .NotBeNull()
@@ -89,10 +86,11 @@ public class SerializerTests
             .Be(context.SentTime);
     }
 
-    private Serializer Serializer(Func<ITypesMap, ITypesMap> map) => new(null!, _formatter, new Wrap(map(new TypesMapper())));
+    private IMessageSerializer Serializer(Func<ITypesMap, ITypesMap> map) => 
+        new Serializer(null!, _formatter, new Wrap(map(new TypesMapper())));
 
-    private static CloudEvent Deserialize(MemoryStream stream) =>
-        JsonSerializer.Deserialize<CloudEvent>(stream.ToArray(), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+    private static CloudEvent Deserialize(byte[] body) =>
+        JsonSerializer.Deserialize<CloudEvent>(body, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
     private record UserRegisteredEvent;
 }
