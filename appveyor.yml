@@ -24,7 +24,7 @@ before_test:
   - sudo wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O - | /bin/bash
   - dapr init --slim
 after_test:
-  - dotnet tool restore && cd MassTransit.CloudEvents.Tests && dotnet stryker -r "['cleartext']"
+  - dotnet tool restore && cd MassTransit/CloudEventify.MassTransit.Tests && dotnet dotnet-stryker -p CloudEventify.MassTransit.csproj --reporter cleartext
 test_script:
   - dotnet test --collect:"XPlat Code Coverage"
 environment:
