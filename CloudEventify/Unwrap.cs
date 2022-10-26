@@ -5,10 +5,10 @@ namespace CloudEventify;
 
 public class Unwrap
 {
-    private readonly IMap<string, Type> _map;
+    private readonly ITypeMap<string, Type> _map;
     private readonly JsonSerializerOptions _options;
 
-    public Unwrap(IMap<string, Type> map, JsonSerializerOptions options)
+    public Unwrap(ITypeMap<string, Type> map, JsonSerializerOptions options)
     {
         _map = map;
         _options = options;

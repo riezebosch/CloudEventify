@@ -1,6 +1,6 @@
 namespace CloudEventify;
 
-public interface IMap<in TFrom, out TTo>
+public interface ITypeMap<in TFrom, out TTo>
 {
     TTo this[TFrom type] { get; }
 }

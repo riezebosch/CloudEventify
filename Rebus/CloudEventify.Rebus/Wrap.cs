@@ -28,11 +28,11 @@ public class Wrap
             Type = map.Type
         };
 
-        var mapper = new RebusHeader2CloudAttributeMap();
+        var mapper = HeaderMap.Instance;
 
         foreach (var header in message.Headers)
         {
-            cloudEvent.SetAttributeFromString(mapper.ToCloudAttributeName(header.Key), header.Value);
+            cloudEvent.SetAttributeFromString(mapper.Forward[header.Key], header.Value);
         }
 
         return cloudEvent;

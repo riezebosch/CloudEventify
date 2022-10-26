@@ -16,7 +16,7 @@ public static class Factory
 
     public static StandardConfigurer<ITransport> UseCloudEventAttributesForHeaders(this StandardConfigurer<ITransport> configurer)
     {
-        configurer.Decorate(c => new CloudEventAttributeHeaderDecorator(c.Get<ITransport>()));
+        configurer.Decorate(c => new TransportDecorator(c.Get<ITransport>()));
         return configurer;
     }
 }
