@@ -9,3 +9,4 @@ riderModule.iml
 StrykerOutput/
 reports/
 .vs
+coverage.*.xml

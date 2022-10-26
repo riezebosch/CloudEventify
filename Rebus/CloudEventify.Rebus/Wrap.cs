@@ -6,10 +6,10 @@ namespace CloudEventify.Rebus;
 
 public class Wrap
 {
-    private readonly ITypesMap _mapper;
+    private readonly IMap _mapper;
     private readonly Uri _source;
 
-    public Wrap(ITypesMap mapper, Uri source)
+    public Wrap(IMap mapper, Uri source)
     {
         _mapper = mapper;
         _source = source;

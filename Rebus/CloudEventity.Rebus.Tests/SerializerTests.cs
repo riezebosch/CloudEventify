@@ -30,9 +30,8 @@ public class SerializerTests
             .Subscriptions(s => s.StoreInMemory())
             .Routing(r => r.TypeBased().Map<A.UserLoggedIn>("user"))
             .Serialization(s => s.UseCloudEvents()
-                .WithTypes(types => types.Map<A.UserLoggedIn>("user.loggedIn").WithFormatSubject<A.UserLoggedIn>((obj) => { return $"user/{obj.Id}"; }))
-                .WithSource(new System.Uri("uri:MySourceApp"))
-                )
+                .WithTypes(types => types.Map<A.UserLoggedIn>("user.loggedIn", m => m with { Subject = x => $"user/{x.Id}" }))
+                .WithSource(new System.Uri("uri:MySourceApp")))
             .Start();
 
         await bus.Subscribe<A.UserLoggedIn>();

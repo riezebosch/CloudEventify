@@ -1,6 +1,4 @@
-﻿using CloudEventify;
-using CloudEventify.Rebus;
-using Rebus.Messages;
+﻿using Rebus.Messages;
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -13,7 +11,8 @@ namespace CloudEventity.Rebus.Tests
         public void EnvelopeWithFormattedSubjectFromObject()
         {
             var data = SomeDataObject.GetRandom();
-            var sut = new Wrap(new TypesMapper().Map<SomeDataObject>("PrettyObject").WithFormatSubject((SomeDataObject obj) => { return $"event/{obj.Id}"; }), new Uri("test:uri"));
+            var sut = new Wrap(new Mapper()
+                .Map<SomeDataObject>("PrettyObject", m => m with { Subject = obj => $"event/{obj.Id}"}), new Uri("test:uri"));
             var res = sut.Envelope(new Message(
                 new Dictionary<string, string> {
                     { "rbs2-msg-id", Guid.NewGuid().ToString() },
@@ -26,7 +25,7 @@ namespace CloudEventity.Rebus.Tests
         [Fact]
         public void EnvelopeWithFormattedSubject()
         {
-            var sut = new Wrap(new TypesMapper().Map<string>("my-custom-event").WithFormatSubject<string>((string obj) => { return $"event/{obj}"; }), new Uri("test:uri"));
+            var sut = new Wrap(new Mapper().Map<string>("my-custom-event", m => m with { Subject = x => $"event/{x}"}), new Uri("test:uri"));
             var res = sut.Envelope(new Message(
                 new Dictionary<string, string> {
                     { "rbs2-msg-id", Guid.NewGuid().ToString() },
@@ -39,7 +38,7 @@ namespace CloudEventity.Rebus.Tests
         [Fact]
         public void EnvelopeWithConfiguredUri()
         {
-            var sut = new Wrap(new TypesMapper().Map<string>("my-custom-event"), new Uri("test:uri"));
+            var sut = new Wrap(new Mapper().Map<string>("my-custom-event"), new Uri("test:uri"));
             var res = sut.Envelope(new Message(
                 new Dictionary<string, string> {
                     { "rbs2-msg-id", Guid.NewGuid().ToString() },
@@ -52,7 +51,7 @@ namespace CloudEventity.Rebus.Tests
         [Fact]
         public void EnvelopeWithRequiredRebusHeaderMessageId()
         {
-            var sut = new Wrap(new TypesMapper().Map<string>("my-custom-event"), new Uri("test:uri"));
+            var sut = new Wrap(new Mapper().Map<string>("my-custom-event"), new Uri("test:uri"));
             var fact = Guid.NewGuid().ToString();
             var res = sut.Envelope(new Message(
                 new Dictionary<string, string> {
@@ -66,7 +65,7 @@ namespace CloudEventity.Rebus.Tests
         [Fact]
         public void EnvelopeWithRquiredRebusHeaderSenttime()
         {
-            var sut = new Wrap(new TypesMapper().Map<string>("my-custom-event"), new Uri("test:uri"));
+            var sut = new Wrap(new Mapper().Map<string>("my-custom-event"), new Uri("test:uri"));
             //Note you lose some precision due to serialization format
             var fact = new DateTimeOffset(2007, 10, 31, 21, 0, 0, new TimeSpan(-8, 0, 0));
             var res = sut.Envelope(new Message(
@@ -100,7 +99,7 @@ namespace CloudEventity.Rebus.Tests
         [Fact]
         public void EnvelopeWithDataObjectFromBody()
         {
-            var sut = new Wrap(new TypesMapper().Map<SomeDataObject>("myDataObjectTopic"), new Uri("test:uri"));
+            var sut = new Wrap(new Mapper().Map<SomeDataObject>("myDataObjectTopic"), new Uri("test:uri"));
             var fact = SomeDataObject.GetRandom();
             var res = sut.Envelope(new Message(
                 new Dictionary<string, string> {
@@ -114,7 +113,7 @@ namespace CloudEventity.Rebus.Tests
         [Fact]
         public void EnvelopeWithMappedType()
         {
-            var fact = new TypesMapper().Map<SomeDataObject>("someDataObject553").Map<string>("stringObject");
+            var fact = new Mapper().Map<SomeDataObject>("someDataObject553").Map<string>("stringObject");
             var sut = new Wrap(fact, new Uri("test:uri"));
             var res = sut.Envelope(new Message(
                 new Dictionary<string, string> {

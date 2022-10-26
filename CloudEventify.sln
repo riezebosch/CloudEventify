@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventity.Rebus.Tests",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventify", "CloudEventify\CloudEventify.csproj", "{6E57FD1F-2509-4E71-AE76-A9D919A77F27}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventity.Tests", "CloudEventity.Tests\CloudEventity.Tests.csproj", "{40078691-2A19-4E8B-93CA-EB234037C094}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,6 +87,10 @@ Global
 		{6E57FD1F-2509-4E71-AE76-A9D919A77F27}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E57FD1F-2509-4E71-AE76-A9D919A77F27}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E57FD1F-2509-4E71-AE76-A9D919A77F27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40078691-2A19-4E8B-93CA-EB234037C094}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40078691-2A19-4E8B-93CA-EB234037C094}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40078691-2A19-4E8B-93CA-EB234037C094}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40078691-2A19-4E8B-93CA-EB234037C094}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D2D6EA38-194F-4DC3-BF99-7E8ADEF8A48D} = {F4CDDE17-BD5E-4495-94E0-44592CCB015B}

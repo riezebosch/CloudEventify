@@ -7,7 +7,7 @@ namespace CloudEventify.MassTransit;
 
 internal class Builder : CloudEvents, ISerializerFactory
 {
-    private readonly ITypesMap _mapper = new TypesMapper();
+    private readonly IMap _mapper = new Mapper();
     
     private readonly JsonSerializerOptions _options = new() { PropertyNameCaseInsensitive = true };
 
@@ -25,7 +25,7 @@ internal class Builder : CloudEvents, ISerializerFactory
         return this;
     }
 
-    CloudEvents Types<CloudEvents>.WithTypes(Func<ITypesMap, ITypesMap> map)
+    CloudEvents Types<CloudEvents>.WithTypes(Func<IMap, IMap> map)
     {
         map(_mapper);
         return this;

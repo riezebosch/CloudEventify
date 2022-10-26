@@ -85,9 +85,27 @@ public class SerializerTests
             .And
             .Be(context.SentTime);
     }
+    
+    [Fact]
+    public void UseSubject()
+    {
+        // Arrange
+        var message = _faker.Generate();
+        var context = new MessageSendContext<UserRegisteredEvent>(message);
 
-    private IMessageSerializer Serializer(Func<ITypesMap, ITypesMap> map) => 
-        new Serializer(null!, _formatter, new Wrap(map(new TypesMapper())));
+        // Act
+        var serializer = Serializer(types => types.Map<UserRegisteredEvent>("asdf", m => m with{ Subject = _ => "efgh"}));
+        var body = serializer.GetMessageBody(context);
+
+        // Assert
+        Deserialize(body.GetBytes())
+            .Subject
+            .Should()
+            .Be("efgh");
+    }
+
+    private IMessageSerializer Serializer(Func<IMap, IMap> map) => 
+        new Serializer(null!, _formatter, new Wrap(map(new Mapper())));
 
     private static CloudEvent Deserialize(byte[] body) =>
         JsonSerializer.Deserialize<CloudEvent>(body, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });

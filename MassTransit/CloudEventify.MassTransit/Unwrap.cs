@@ -8,7 +8,7 @@ public class Unwrap
     private readonly JsonSerializerOptions _options;
     private readonly CloudEventify.Unwrap _unwrap;
 
-    public Unwrap(ITypesMap mapper, JsonSerializerOptions options)
+    public Unwrap(IMap mapper, JsonSerializerOptions options)
     {
         _unwrap = new CloudEventify.Unwrap(mapper, options);
         _options = options;

@@ -6,7 +6,7 @@ namespace CloudEventify.Rebus;
 
 internal class Builder : CloudEvents
 {
-    private readonly ITypesMap _mapper = new TypesMapper()
+    private readonly IMap _mapper = new Mapper()
         .Map<SubscribeRequest>("subscribe");
 
     private readonly JsonSerializerOptions _options = new();
@@ -27,7 +27,7 @@ internal class Builder : CloudEvents
         return this;
     }
 
-    CloudEvents Types<CloudEvents>.WithTypes(Func<ITypesMap, ITypesMap> map)
+    CloudEvents Types<CloudEvents>.WithTypes(Func<IMap, IMap> map)
     {
         map(_mapper);
         return this;

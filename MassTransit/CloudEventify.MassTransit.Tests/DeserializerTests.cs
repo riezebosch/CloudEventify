@@ -57,10 +57,10 @@ public class DeserializerTests
             });
     }
 
-    private static IMessageDeserializer Serializer(Func<ITypesMap, ITypesMap> map)
+    private static IMessageDeserializer Serializer(Func<IMap, IMap> map)
     {
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-        return new Deserializer(null!, Formatter.New(options), new Unwrap(map(new TypesMapper()), options), null!);
+        return new Deserializer(null!, Formatter.New(options), new Unwrap(map(new Mapper()), options), null!);
     }
 
     [Fact]

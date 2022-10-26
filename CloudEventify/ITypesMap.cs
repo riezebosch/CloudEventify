@@ -1,8 +1,8 @@
 namespace CloudEventify;
 
-public interface ITypesMap : IMap<Type, ITypeMap>, IMap<string, Type>
+public interface IMap : IMap<Type, Map>, IMap<string, Type>
 {
-    ITypesMap Map<T>(string type);
-    ITypesMap WithFormatSubject<T>(Func<T, string> formatSubject);
+    IMap Map<T>(string type);
+    IMap Map<T>(string type, Func<Map<T>, Map<T>> configure);
 }
 
