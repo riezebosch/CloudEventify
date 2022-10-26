@@ -1,8 +1,8 @@
-# MassTransit+CloudEvents
+# CloudEvents[Rebus|MassTransit|Dapr]
 
-[![nuget](https://img.shields.io/nuget/v/CloudEventify.svg)](https://www.nuget.org/packages/CloudEventify.MassTransit/)
-[![codecov](https://codecov.io/gh/riezebosch/CloudEventify/branch/main/graph/badge.svg)](https://codecov.io/gh/riezebosch/MassTransit.CloudEvents)
-[![stryker](https://img.shields.io/endpoint?style=flat&label=stryker&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Friezebosch%2CloudEventify.MassTransit%2Fmain)](https://dashboard.stryker-mutator.io/reports/github.com/riezebosch/MassTransit.CloudEvents/main)
+[![nuget](https://img.shields.io/nuget/v/CloudEventify.svg)](https://www.nuget.org/packages/CloudEventify/)
+[![codecov](https://codecov.io/gh/riezebosch/CloudEventify/branch/main/graph/badge.svg)](https://codecov.io/gh/riezebosch/CloudEventify)
+[![stryker](https://img.shields.io/endpoint?style=flat&label=stryker&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Friezebosch%2FCloudEventify%2Fmain)](https://dashboard.stryker-mutator.io/reports/github.com/riezebosch/CloudEventify/main)
 [![build status](https://ci.appveyor.com/api/projects/status/a03ol21xakxbf477/branch/main?svg=true)](https://ci.appveyor.com/project/riezebosch/CloudEventify)
 
 ## TL;DR
@@ -11,7 +11,20 @@
 
 ## Use CloudEvents
 
+### Rebus + RabbitMQ
+
+```c#
+Configure.With(new EmptyActivator())
+    .Transport(t => t.UseRabbitMqAsOneWayClient(_container.ConnectionString))
+    .Serialization(s => s.UseCloudEvents()
+        .WithTypes(types => types.Map<UserLoggedIn>("loggedIn")))
+    .Start();
+```
+
+### MassTransit + RabbitMQ
+
 On bus level:
+
 ```c#
 var bus = Bus.Factory
     .CreateUsingRabbitMq(cfg =>
@@ -21,6 +34,7 @@ var bus = Bus.Factory
 ```
 
 On a specific receive endpoint:
+
 ```c#
 var bus = Bus.Factory
     .CreateUsingRabbitMq(cfg =>
@@ -35,28 +49,38 @@ var bus = Bus.Factory
 This adds a _deserializer_ to support incoming messages using the default `application/cloudevents+json` content type **and**
 sets the _serializer_ to wrap outgoing messages in a cloud event envelope.
 
-## Content Type
-
-```c#
-cfg.UseCloudEvents()
-    .WithContentType(new ContentType("text/plain"));
-```
-
-Sets the content-type for both the serializer _and_ the deserializer.
-For example when the publishing side chooses [a different content type](https://github.com/dapr/components-contrib/blob/master/bindings/rabbitmq/rabbitmq.go#L98).
-
-You can invoke the `UseCloudEvents` with a different `ContentType` multiple times
-but the last one wins for the outbound (serializer) configuration.
-
 ## Message Types
 
+All (custom) types must be explicitly mapped, both for outgoing and incoming messages.
+
 ```c#
-cfg.UseCloudEvents()
-    .Type<UserLoggedIn>("loggedIn");
+.UseCloudEvents()
+    .WithTypes(t => t.Map<UserLoggedIn>("loggedIn"));
 ```
 
 Specify the `type` attribute on the cloud events envelope. 
-Used by the deserializer when you want to deserialize to a specific subtype.
+Used by the deserializer when you want to deserialize to a specific (sub)type.
+
+## Subject
+
+The subject can be constructed using the instance of the outgoing message.
+
+```c#
+.UseCloudEvents()
+    .WithTypes(t => t.Map<UserLoggedIn>("loggedIn"), map => map with { Subject = x => x.SomeProperty });
+```
+
+## Source 
+
+For [Rebus](Rebus) you can also specify the `Source` attribute to be applied on the outgoing cloud event:
+
+```c#
+.Serialization(s => s.UseCloudEvents()
+    .WithTypes(types => types.Map<UserLoggedIn>("user.loggedIn"))
+    .WithSource(new System.Uri("uri:MySourceApp")))
+```
+
+Using [MassTransit](MassTransit) the `Source` attribute is used from the `SendContext`.
 
 ## Limitations
 
@@ -65,4 +89,4 @@ It is safe to assume that other patterns supported by MassTransit will not work 
 
 ## Interoperable
 
-In the [integration tests](MassTransit.CloudEvents.IntegrationTests), [dapr](https://dapr.io) is used as publisher and subscriber to test both the serializer and deserializer. 
+In the [integration tests](MassTransit/CloudEventify.MassTransit.IntegrationTests), [dapr](https://dapr.io) is used as publisher and subscriber to test both the serializer and deserializer. 

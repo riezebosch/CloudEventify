@@ -1,0 +1,9 @@
+stryker-config:
+  project: CloudEventify.MassTransit.csproj
+  test-projects:
+    - ./MassTransit/CloudEventify.MassTransit.Tests
+    - ./MassTransit/CloudEventify.MassTransit.IntegrationTests
+  project-info:
+    name: github.com/riezebosch/CloudEventify
+    version: main
+    module: MassTransit

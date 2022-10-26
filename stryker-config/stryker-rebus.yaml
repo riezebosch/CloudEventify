@@ -1,0 +1,9 @@
+stryker-config:
+  project: CloudEventify.Rebus.csproj
+  test-projects:
+    - ./Rebus/CloudEventify.Rebus.Tests
+    - ./Rebus/CloudEventify.Rebus.IntegrationTests
+  project-info:
+    name: github.com/riezebosch/CloudEventify
+    version: main
+    module: Rebus

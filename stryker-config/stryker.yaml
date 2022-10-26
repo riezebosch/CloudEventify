@@ -1,0 +1,8 @@
+stryker-config:
+  project: CloudEventify.csproj
+  test-projects:
+    - ./CloudEventify.Tests
+  project-info:
+    name: github.com/riezebosch/CloudEventify
+    version: main
+    module: CloudEventify

@@ -1,0 +1,8 @@
+stryker-config:
+  project: CloudEventify.Dapr.csproj
+  test-projects:
+    - ./Dapr/CloudEventify.Dapr.IntegrationTests
+  project-info:
+    name: github.com/riezebosch/CloudEventify
+    version: main
+    module: Dapr
