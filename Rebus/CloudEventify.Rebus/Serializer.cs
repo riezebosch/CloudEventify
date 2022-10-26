@@ -23,10 +23,27 @@ internal class Serializer : ISerializer
     Task<Message> ISerializer.Deserialize(TransportMessage transportMessage)
     {
         var cloudEvent = _formatter.Decode(transportMessage.Body);
+        var mapper = new RebusHeader2CloudAttributeMap();
+
+        //This may be unnecesary when the whole thing happens on the transport level for rebus now (if you enble it)
         var headers = new Dictionary<string, string>
         {
             [Headers.MessageId] = cloudEvent.Id!,
         };
+
+        foreach (var rbsCloudeAttribName in mapper.Rebus2CloudMap.Values)
+        {
+            var attrib = cloudEvent.ExtensionAttributes.FirstOrDefault(ea => ea.Name.Equals(rbsCloudeAttribName));
+            if (attrib != null)
+            {
+                var value = cloudEvent[attrib];
+                if (value != null)
+                {
+                    headers[mapper.FromCloudAttribute(rbsCloudeAttribName)] = (string)value;
+                }
+            }
+
+        }
 
         return Task.FromResult(new Message(headers, _unwrap.Envelope(cloudEvent)));
     }

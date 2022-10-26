@@ -18,7 +18,7 @@ public class Wrap
     public CloudEvent Envelope(Message message)
     {
         var map = _mapper[message.Body.GetType()];
-        return new CloudEvent(CloudEventsSpecVersion.V1_0)
+        var cloudEvent =  new CloudEvent(CloudEventsSpecVersion.V1_0)
         {
             Id = message.GetMessageId(),
             Subject = map.Subject(message.Body),
@@ -27,5 +27,16 @@ public class Wrap
             Time = DateTimeOffset.Parse(message.Headers[Headers.SentTime]),
             Type = map.Type
         };
+
+        var mapper = new RebusHeader2CloudAttributeMap();
+
+        foreach (var header in message.Headers)
+        {
+            cloudEvent.SetAttributeFromString(mapper.ToCloudAttributeName(header.Key), header.Value);
+        }
+
+        return cloudEvent;
+        
     }
+
 }
