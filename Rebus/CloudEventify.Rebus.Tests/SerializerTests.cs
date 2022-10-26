@@ -11,7 +11,7 @@ using Rebus.Routing.TypeBased;
 using Rebus.Transport.InMem;
 using Xunit;
 
-namespace CloudEventity.Rebus.Tests;
+namespace CloudEventify.Rebus.Tests;
 
 public class SerializerTests
 {

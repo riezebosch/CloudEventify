@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using Xunit;
 
-namespace CloudEventity.Rebus.Tests
+namespace CloudEventify.Rebus.Tests
 {
     public class WrapTests
     {

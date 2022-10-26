@@ -2,8 +2,7 @@
   "stryker-config": {
     "project-info": {
       "name": "github.com/riezebosch/CloudEventify",
-      "version": "main",
-      "module": "MassTransit"
+      "version": "main"
     }
   }
 }

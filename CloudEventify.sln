@@ -31,11 +31,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Rebus", "Rebus", "{F4CDDE17
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventify.Rebus", "Rebus\CloudEventify.Rebus\CloudEventify.Rebus.csproj", "{186CAC6F-3AD8-4D9F-AD3D-81E4BF8828A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventity.Rebus.Tests", "Rebus\CloudEventity.Rebus.Tests\CloudEventity.Rebus.Tests.csproj", "{05FCC259-5E44-4B2A-9901-DF7B116095C1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventify.Rebus.Tests", "Rebus\CloudEventify.Rebus.Tests\CloudEventify.Rebus.Tests.csproj", "{05FCC259-5E44-4B2A-9901-DF7B116095C1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventify", "CloudEventify\CloudEventify.csproj", "{6E57FD1F-2509-4E71-AE76-A9D919A77F27}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventity.Tests", "CloudEventity.Tests\CloudEventity.Tests.csproj", "{40078691-2A19-4E8B-93CA-EB234037C094}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventify.Tests", "CloudEventify.Tests\CloudEventify.Tests.csproj", "{40078691-2A19-4E8B-93CA-EB234037C094}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
