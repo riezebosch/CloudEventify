@@ -15,11 +15,16 @@
 
 ```c#
 Configure.With(new EmptyActivator())
-    .Transport(t => t.UseRabbitMqAsOneWayClient(_container.ConnectionString))
+    .Transport(t => t
+        .UseCloudEventAttributesForHeaders()
+        .UseRabbitMqAsOneWayClient(_container.ConnectionString))
     .Serialization(s => s.UseCloudEvents()
         .WithTypes(types => types.Map<UserLoggedIn>("loggedIn")))
     .Start();
 ```
+
+Specifically for Rebus it is required to decorate the transport so it supports the rebus headers. (Rebus relies on the header rbs2-msg-id, which will be taken from the cloudevent.Id property as minimum)
+Other rebus specific headers are also mapped to cloud event extension attributes (for convenience / future proving, but not required).
 
 ### MassTransit + RabbitMQ
 
