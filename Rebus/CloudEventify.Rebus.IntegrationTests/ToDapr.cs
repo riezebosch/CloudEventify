@@ -74,7 +74,9 @@ public class ToDapr : IClassFixture<RabbitMqContainer>
     private async Task Publish(UserLoggedIn message, ITestOutputHelper logger)
     {
         var producer = Configure.With(new EmptyActivator())
-            .Transport(t => t.UseRabbitMqAsOneWayClient(_container.ConnectionString))
+            .Transport(t => t
+                                .UseCloudEventAttributesForHeaders()
+                                .UseRabbitMqAsOneWayClient(_container.ConnectionString))
             .Serialization(s => s.UseCloudEvents()
                 .WithTypes(types => types.Map<UserLoggedIn>("loggedIn")))
             .Logging(l => l.MicrosoftExtensionsLogging(logger.ToLoggerFactory()))

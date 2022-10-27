@@ -43,7 +43,9 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
         var activator = new BuiltinHandlerActivator()
             .Register(hypothesis.AsHandler);
         var subscriber = Configure.With(activator)
-            .Transport(t => t.UseRabbitMq(_container.ConnectionString, queue))
+            .Transport(t => t
+                    .UseCloudEventAttributesForHeaders()
+                    .UseRabbitMq(_container.ConnectionString, queue))
             .Serialization(s => s.UseCloudEvents()
                 .WithTypes(t => t.Map<UserLoggedIn>("loggedIn"))
                 .WithJsonOptions(options => options.PropertyNameCaseInsensitive = true))
