@@ -42,7 +42,21 @@ namespace CloudEventify.Rebus.Tests
 
             map.Forward.Keys.Distinct().Count().Should().Be(21);
             map.Forward.Values.Distinct().Count().Should().Be(21);
+        }
 
+        [Fact]
+        public void Should_be_Singleton()
+        {
+            var map = HeaderMap.Instance;
+            var map2 = HeaderMap.Instance;
+            HeaderMap.ReferenceEquals(map, map2);
+            map2.Should().BeEquivalentTo(map);
+        }
+
+        [Fact]
+        public void Should_be_strictly_specific_mapping()
+        {
+            var map = HeaderMap.Instance;
             map.Forward[Headers.ContentEncoding].Should().Be("r2contentencoding");
             map.Forward[Headers.ContentType].Should().Be("r2contenttype");
             map.Forward[Headers.CorrelationId].Should().Be("r2corrid");
@@ -64,15 +78,9 @@ namespace CloudEventify.Rebus.Tests
             map.Forward[Headers.SourceQueue].Should().Be("r2sourcequeue");
             map.Forward[Headers.TimeToBeReceived].Should().Be("r2timetobereceived");
             map.Forward[Headers.Type].Should().Be("r2msgtype");
-        }
+            map.Forward.Keys.Distinct().Count().Should().Be(21);
+            map.Forward.Values.Distinct().Count().Should().Be(21);
 
-        [Fact]
-        public void Should_be_Singleton()
-        {
-            var map = HeaderMap.Instance;
-            var map2 = HeaderMap.Instance;
-            HeaderMap.ReferenceEquals(map, map2);
-            map2.Should().BeEquivalentTo(map);
         }
     }
 }

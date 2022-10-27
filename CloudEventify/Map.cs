@@ -24,6 +24,7 @@ public class Map<T1, T2>
             set { _dictionary[index] = value; }
         }
 
+        public IReadOnlyDictionary<T3, T4> Items { get { return _dictionary; } }
         public IReadOnlyCollection<T3> Keys => _dictionary.Keys;
         public IReadOnlyCollection<T4> Values => _dictionary.Values;
     }
