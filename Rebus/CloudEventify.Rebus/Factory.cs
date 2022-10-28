@@ -6,17 +6,15 @@ namespace CloudEventify.Rebus;
 
 public static class Factory
 {
-    public static CloudEvents UseCloudEvents(this StandardConfigurer<ISerializer> s)
+    public static RebusConfigurer UseCloudEvents(this RebusConfigurer rebusConfigurer, Action<CloudEvents> action)
     {
-        var builder = new Builder();
-        s.Register(_ => builder.New());
+        return rebusConfigurer
+            .Transport(c => c.Decorate(c => new TransportDecorator(c.Get<ITransport>())))
+            .Serialization(s=> {
+                var builder = new Builder();
+                s.Register(_ => builder.New());
 
-        return builder;
-    }
-
-    public static StandardConfigurer<ITransport> UseCloudEventAttributesForHeaders(this StandardConfigurer<ITransport> configurer)
-    {
-        configurer.Decorate(c => new TransportDecorator(c.Get<ITransport>()));
-        return configurer;
+                action(builder);
+            });
     }
 }

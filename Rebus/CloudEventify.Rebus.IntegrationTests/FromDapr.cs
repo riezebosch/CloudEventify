@@ -34,7 +34,7 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
         // Arrange
         const string topic = "user/loggedIn";
         const string queue = "user:loggedIn:rabbitmq";
-        
+
         var message = Message();
         var hypothesis = Hypothesis
             .For<UserLoggedIn>()
@@ -43,34 +43,33 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
         var activator = new BuiltinHandlerActivator()
             .Register(hypothesis.AsHandler);
         var subscriber = Configure.With(activator)
-            .Transport(t => t
-                    .UseCloudEventAttributesForHeaders()
-                    .UseRabbitMq(_container.ConnectionString, queue))
-            .Serialization(s => s.UseCloudEvents()
+            .UseCloudEvents(c => c
                 .WithTypes(t => t.Map<UserLoggedIn>("loggedIn"))
                 .WithJsonOptions(options => options.PropertyNameCaseInsensitive = true))
+            .Transport(t => t
+                    .UseRabbitMq(_container.ConnectionString, queue))
             .Logging(l => l.MicrosoftExtensionsLogging(_output.ToLoggerFactory()))
             .Start();
         await subscriber.Subscribe<UserLoggedIn>();
 
         BindRebus(_container.ConnectionString, topic, queue);
-        
+
         // Act
         await Publish(topic, message, _output);
 
         // Assert
         await hypothesis.Validate(5.Seconds());
     }
-    
+
     private static void BindRebus(string connectionString, string topic, string queue)
     {
         var model = new ConnectionFactory
-            {
-                Endpoint = new AmqpTcpEndpoint(new Uri(connectionString))
-            }
+        {
+            Endpoint = new AmqpTcpEndpoint(new Uri(connectionString))
+        }
             .CreateConnection()
             .CreateModel();
-        
+
         model.ExchangeDeclare(topic, "fanout", durable: true);
         model.QueueBind(queue, topic, "");
     }
@@ -87,14 +86,14 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
             .UseCloudEvents()
             .WithTypes(types => types.Map<UserLoggedIn>("loggedIn"))
             .Build();
-        
+
         await client
             .PublishEventAsync("my-pubsub", topic, message);
     }
 
     public record UserLoggedIn(string Id);
-        
-    private static UserLoggedIn Message() => 
+
+    private static UserLoggedIn Message() =>
         new Faker<UserLoggedIn>()
             .CustomInstantiator(f => new UserLoggedIn(f.Random.Hash()))
             .Generate();

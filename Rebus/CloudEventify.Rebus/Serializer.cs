@@ -23,11 +23,6 @@ internal class Serializer : ISerializer
     Task<Message> ISerializer.Deserialize(TransportMessage transportMessage)
     {
         var cloudEvent = _formatter.Decode(transportMessage.Body);
-
-        var headers = cloudEvent.GetRebusHeaders();
-        headers[Headers.MessageId] = cloudEvent.Id!;
-        headers[Headers.SentTime] = cloudEvent.Time?.ToString("O")!;
-
-        return Task.FromResult(new Message(headers, _unwrap.Envelope(cloudEvent)));
+        return Task.FromResult(new Message(transportMessage.Headers, _unwrap.Envelope(cloudEvent)));
     }
 }
