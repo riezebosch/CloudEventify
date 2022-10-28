@@ -15,17 +15,15 @@
 
 ```c#
 Configure.With(new EmptyActivator())
-    .Transport(t => t
-        .UseCloudEventAttributesForHeaders()
-        .UseRabbitMqAsOneWayClient(_container.ConnectionString))
-    .Serialization(s => s.UseCloudEvents()
+    .UseCloudEvents(c => c
         .WithTypes(types => types.Map<UserLoggedIn>("loggedIn")))
+    .Transport(t => t
+        .UseRabbitMqAsOneWayClient(_container.ConnectionString))
     .Start();
 ```
 
-Specifically for Rebus it is required to decorate the transport so it supports the rebus headers. (Rebus relies on the header rbs2-msg-id, which will be taken from the cloudevent.Id property as minimum)
-Other rebus specific headers are also mapped to cloud event extension attributes (for convenience / future proving, but not required).
-
+Rebus headers are maintained and transported in the CloudEvent (independent of the transport setup).
+You must specify mapping of your CloudEvents to enable this (that is why there is always type mapping).
 ### MassTransit + RabbitMQ
 
 On bus level:
@@ -59,8 +57,8 @@ sets the _serializer_ to wrap outgoing messages in a cloud event envelope.
 All (custom) types must be explicitly mapped, both for outgoing and incoming messages.
 
 ```c#
-.UseCloudEvents()
-    .WithTypes(t => t.Map<UserLoggedIn>("loggedIn"));
+.UseCloudEvents(c => c.
+    .WithTypes(t => t.Map<UserLoggedIn>("loggedIn")));
 ```
 
 Specify the `type` attribute on the cloud events envelope. 
@@ -71,8 +69,8 @@ Used by the deserializer when you want to deserialize to a specific (sub)type.
 The subject can be constructed using the instance of the outgoing message.
 
 ```c#
-.UseCloudEvents()
-    .WithTypes(t => t.Map<UserLoggedIn>("loggedIn"), map => map with { Subject = x => x.SomeProperty });
+.UseCloudEvents(c => c.
+    .WithTypes(t => t.Map<UserLoggedIn>("loggedIn"), map => map with { Subject = x => x.SomeProperty })));
 ```
 
 ## Source 
@@ -80,7 +78,7 @@ The subject can be constructed using the instance of the outgoing message.
 For [Rebus](Rebus) you can also specify the `Source` attribute to be applied on the outgoing cloud event:
 
 ```c#
-.Serialization(s => s.UseCloudEvents()
+.UseCloudEvents(c => c
     .WithTypes(types => types.Map<UserLoggedIn>("user.loggedIn"))
     .WithSource(new System.Uri("uri:MySourceApp")))
 ```
