@@ -43,7 +43,7 @@ public class ToDapr : IClassFixture<RabbitMqContainer>
         await Publish(message, _output);
 
         // Assert
-        await hypothesis.Validate(10.Seconds());
+        await hypothesis.Validate(30.Seconds());
     }
         
         

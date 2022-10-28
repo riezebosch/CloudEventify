@@ -31,7 +31,7 @@ public class UserControllerTests
         await using var sidecar = await Sidecar(_output);
         await Publish();
 
-        await hypothesis.Validate(10.Seconds());
+        await hypothesis.Validate(30.Seconds());
     }
 
     private static async Task<Sidecar> Sidecar(ITestOutputHelper logger)

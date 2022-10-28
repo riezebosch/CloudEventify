@@ -57,7 +57,7 @@ public class UseCloudEvents : IClassFixture<RabbitMqContainer>
         await endpoint.Send(message);
 
         // Assert
-        await hypothesis.Validate(10.Seconds());
+        await hypothesis.Validate(30.Seconds());
     }
     
     public record Request(int UserId);

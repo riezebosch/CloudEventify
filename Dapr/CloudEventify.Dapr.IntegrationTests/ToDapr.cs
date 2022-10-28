@@ -36,7 +36,7 @@ public class ToDapr
         await Publish(message);
 
         // Assert
-        await hypothesis.Validate(10.Seconds());
+        await hypothesis.Validate(30.Seconds());
     }
 
     private static async Task Publish(UserLoggedIn message)
