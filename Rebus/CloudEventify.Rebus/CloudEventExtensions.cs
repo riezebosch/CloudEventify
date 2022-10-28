@@ -1,4 +1,5 @@
 ﻿using CloudNative.CloudEvents;
+using Rebus.Messages;
 
 namespace CloudEventify.Rebus;
 
@@ -8,6 +9,7 @@ public static class CloudEventExtensions
     {
         var mapper = HeaderMap.Instance;
         var res = new Dictionary<string, string>();
+
         foreach (var attrName in mapper.Reverse.Keys)
         {
             var attrib = cloudEvent.ExtensionAttributes.FirstOrDefault(ea => ea.Name.Equals(attrName));
@@ -20,6 +22,10 @@ public static class CloudEventExtensions
                 }
             }
         }
+
+        res[Headers.MessageId] = cloudEvent.Id!;
+        res[Headers.SentTime] = cloudEvent.Time?.ToString("O")!;
+
         return res;
     }
 

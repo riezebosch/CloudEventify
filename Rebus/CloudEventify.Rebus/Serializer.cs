@@ -23,11 +23,10 @@ internal class Serializer : ISerializer
     Task<Message> ISerializer.Deserialize(TransportMessage transportMessage)
     {
         var cloudEvent = _formatter.Decode(transportMessage.Body);
-        var mapper = HeaderMap.Instance;
 
-        //This may be unnecesary when the whole thing happens on the transport level for rebus now (if you enble it)
         var headers = cloudEvent.GetRebusHeaders();
         headers[Headers.MessageId] = cloudEvent.Id!;
+        headers[Headers.SentTime] = cloudEvent.Time?.ToString("O")!;
 
         return Task.FromResult(new Message(headers, _unwrap.Envelope(cloudEvent)));
     }

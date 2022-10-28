@@ -23,14 +23,15 @@ public class TransportDecorator : ITransport
                                     .New(new JsonSerializerOptions(JsonSerializerDefaults.General))
                                     .DecodeStructuredModeMessage(message.Body, null, null);
 
-            //Must meet property..
-            message.Headers[Headers.MessageId] = cloudEvent.Id;
-
             var rbsHeaders = cloudEvent.GetRebusHeaders();
             foreach (var rbsHeader in rbsHeaders)
             {
                 message.Headers[rbsHeader.Key] = rbsHeader.Value;
             }
+
+            //Must meet property..
+            message.Headers[Headers.MessageId] = cloudEvent.Id!;
+            message.Headers[Headers.SentTime] = cloudEvent.Time?.ToString("O")!;
         }
         return message;
     }

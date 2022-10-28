@@ -7,17 +7,9 @@ public sealed class HeaderMap
     private HeaderMap() { }
 
     private static readonly object _lock = new object ();
-    private static Map<string,string> _instance = null!;
-    
-    public static Map<string,string> Instance
-    {
-        get
-        {
-            lock (_lock)
-            {
-                _instance ??= new Dictionary<string, string>()
+    private static Map<string,string> _instance = new Dictionary<string, string>()
                         {
-                            { Headers.MessageId, "r2msgid" },
+                            //{ Headers.MessageId, "r2msgid" },
                             { Headers.Type, "r2msgtype" },
                             { Headers.CorrelationId, "r2corrid" },
                             { Headers.InReplyTo, "r2inreplyto" },
@@ -35,12 +27,10 @@ public sealed class HeaderMap
                             { Headers.DeferCount, "r2defercount" },
                             { Headers.TimeToBeReceived, "r2timetobereceived" },
                             { Headers.Express, "r2express" },
-                            { Headers.SentTime, "r2senttime" },
+                            //{ Headers.SentTime, "r2senttime" },
                             { Headers.Intent, "r2intent" },
                             { Headers.MessagePayloadAttachmentId, "r2msgattachementid" }
                         }.ToMap();
-                return _instance;
-            }
-        }
-    }
+
+    public static Map<string, string> Instance => _instance;
 }

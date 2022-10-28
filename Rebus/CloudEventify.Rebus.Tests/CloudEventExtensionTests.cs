@@ -42,30 +42,39 @@ public class CloudEventExtensionTests
         };
     }
 
-    private Message GetMessage(Dictionary<string,string> headers)
+    private static CloudEvent GetDummyCloudEvent(IDictionary<string,string> headers)
     {
-        var fact = SomeDataObject.GetRandom();
-        return new Message(headers, fact);
-    }
+        var cloudEvent = new CloudEvent(CloudEventsSpecVersion.V1_0)
+        {
+            Id = headers[Headers.MessageId],
+            Subject = "somesubject",
+            Source = new Uri("app://some.source.com"),
+            Time = DateTimeOffset.Parse(headers[Headers.SentTime]),
+            DataContentType = "application/json",
+            DataSchema = new Uri("app://some.schema.com"),
+            Type = "dummy",
+        };
+         
+        var mapper = HeaderMap.Instance;
 
-    private CloudEvent GetCloudEvent(Message msg)
-    {
-        var sut = new Wrap(new Mapper().Map<SomeDataObject>("myDataObjectTopic"), new Uri("test:uri"));
-        var res = sut.Envelope(msg);
-        return res;
+        foreach (var header in headers.Where(h=>h.Key!=Headers.MessageId && h.Key!= Headers.SentTime))
+        {
+            cloudEvent.SetAttributeFromString(mapper.Forward[header.Key], header.Value);
+        }
+        return cloudEvent;
     }
 
     [Fact]
     public void RebusHeaders_From_CloudEvent_Should_Contain_all_Rbs_headers()
     {
         var factheaders = GetHeaders();
-        var factMsg = GetMessage(factheaders);
-        var cloudEvent = GetCloudEvent(factMsg);
+        var cloudEvent = GetDummyCloudEvent(factheaders);
 
         Assert.NotNull(cloudEvent);
-        cloudEvent.Id.Should().Be(factheaders[Headers.MessageId]);
         
         var headers = cloudEvent.GetRebusHeaders();
+        headers[Headers.MessageId].Should().Be(cloudEvent.Id);
+        headers[Headers.SentTime].Should().Be(cloudEvent.Time?.ToString("O"));
         headers.Should().BeEquivalentTo(factheaders);
         headers.Count.Should().Be(21);
     }
@@ -75,19 +84,18 @@ public class CloudEventExtensionTests
     {
         var factheaders = new Dictionary<string, string>
         {
-            { Headers.MessageId, Guid.NewGuid().ToString()}
+            { Headers.MessageId, Guid.NewGuid().ToString() },
+            { Headers.SentTime, DateTimeOffset.UtcNow.ToString("O") }
         };
-        var factMsg = GetMessage(factheaders);
-        var cloudEvent = GetCloudEvent(factMsg);    
-
+        var cloudEvent = GetDummyCloudEvent(factheaders);    
 
         Assert.NotNull(cloudEvent);
         cloudEvent.Id.Should().Be(factheaders[Headers.MessageId]);
+        cloudEvent.Time.Should().Be(DateTimeOffset.Parse(factheaders[Headers.SentTime]));
 
         var headers = cloudEvent.GetRebusHeaders();
         headers.Should().BeEquivalentTo(factheaders);
-        headers[Headers.MessageId].Should().Be(factheaders[Headers.MessageId]);
-        headers.Count.Should().Be(1);
 
+        headers.Count.Should().Be(2);
     }
 }

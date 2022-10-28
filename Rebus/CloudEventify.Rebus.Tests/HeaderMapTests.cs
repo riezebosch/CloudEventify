@@ -29,19 +29,17 @@ namespace CloudEventify.Rebus.Tests
             map.Forward.Keys.Should().Contain(Headers.Express);
             map.Forward.Keys.Should().Contain(Headers.InReplyTo);
             map.Forward.Keys.Should().Contain(Headers.Intent);
-            map.Forward.Keys.Should().Contain(Headers.MessageId);
             map.Forward.Keys.Should().Contain(Headers.MessagePayloadAttachmentId);
             map.Forward.Keys.Should().Contain(Headers.ReturnAddress);
             map.Forward.Keys.Should().Contain(Headers.RoutingSlipItinerary);
             map.Forward.Keys.Should().Contain(Headers.RoutingSlipTravelogue);
             map.Forward.Keys.Should().Contain(Headers.SenderAddress);
-            map.Forward.Keys.Should().Contain(Headers.SentTime);
             map.Forward.Keys.Should().Contain(Headers.SourceQueue);
             map.Forward.Keys.Should().Contain(Headers.TimeToBeReceived);
             map.Forward.Keys.Should().Contain(Headers.Type);
 
-            map.Forward.Keys.Distinct().Count().Should().Be(21);
-            map.Forward.Values.Distinct().Count().Should().Be(21);
+            map.Forward.Keys.Distinct().Count().Should().Be(19);
+            map.Forward.Values.Distinct().Count().Should().Be(19);
         }
 
         [Fact]
@@ -68,18 +66,16 @@ namespace CloudEventify.Rebus.Tests
             map.Forward[Headers.Express].Should().Be("r2express");
             map.Forward[Headers.InReplyTo].Should().Be("r2inreplyto");
             map.Forward[Headers.Intent].Should().Be("r2intent");
-            map.Forward[Headers.MessageId].Should().Be("r2msgid");
             map.Forward[Headers.MessagePayloadAttachmentId].Should().Be("r2msgattachementid");
             map.Forward[Headers.ReturnAddress].Should().Be("r2returnaddress");
             map.Forward[Headers.RoutingSlipItinerary].Should().Be("r2routingitinerary");
             map.Forward[Headers.RoutingSlipTravelogue].Should().Be("r2routingtravelogue");
             map.Forward[Headers.SenderAddress].Should().Be("r2senderaddress");
-            map.Forward[Headers.SentTime].Should().Be("r2senttime");
             map.Forward[Headers.SourceQueue].Should().Be("r2sourcequeue");
             map.Forward[Headers.TimeToBeReceived].Should().Be("r2timetobereceived");
             map.Forward[Headers.Type].Should().Be("r2msgtype");
-            map.Forward.Keys.Distinct().Count().Should().Be(21);
-            map.Forward.Values.Distinct().Count().Should().Be(21);
+            map.Forward.Keys.Distinct().Count().Should().Be(19);
+            map.Forward.Values.Distinct().Count().Should().Be(19);
 
         }
     }

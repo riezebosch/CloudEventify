@@ -30,7 +30,7 @@ public class Wrap
 
         var mapper = HeaderMap.Instance;
 
-        foreach (var header in message.Headers)
+        foreach (var header in message.Headers.Where(h=>h.Key != Headers.MessageId && h.Key != Headers.SentTime))
         {
             cloudEvent.SetAttributeFromString(mapper.Forward[header.Key], header.Value);
         }
