@@ -26,10 +26,10 @@ before_test:
   - dapr init --slim
 after_test:
   - dotnet tool restore
-  - dotnet stryker -f stryker-config/stryker.yaml --reporter cleartext
-  - dotnet stryker -f stryker-config/stryker-rebus.yaml --reporter cleartext
-  - dotnet stryker -f stryker-config/stryker-masstransit.yaml --reporter cleartext
-  - dotnet stryker -f stryker-config/stryker-dapr.yamlreporter --reporter cleartext
+  - dotnet stryker -f stryker-config/stryker.yaml --reporter cleartext --since=main
+  - dotnet stryker -f stryker-config/stryker-rebus.yaml --reporter cleartext --since=main
+  - dotnet stryker -f stryker-config/stryker-masstransit.yaml --reporter cleartext --since=main
+  - dotnet stryker -f stryker-config/stryker-dapr.yaml --reporter cleartext --since=main
 test_script:
   - dotnet test --collect:"XPlat Code Coverage"
 environment:
