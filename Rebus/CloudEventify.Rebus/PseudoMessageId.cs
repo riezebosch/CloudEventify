@@ -4,7 +4,7 @@ using Rebus.Pipeline;
 
 namespace CloudEventify.Rebus;
 
-public class PseudoMessageIdStep : IIncomingStep
+public class PseudoMessageId : IIncomingStep
 {
     public async Task Process(IncomingStepContext context, Func<Task> next)
     {

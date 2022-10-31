@@ -39,20 +39,17 @@ public class FromAzureServiceBus
         using var activator = new BuiltinHandlerActivator()
             .Register(hypothesis.AsHandler);
         using var subscriber = Configure.With(activator)
-            .Transport(t => t.UseAzureServiceBus(
-                $"Endpoint={ConnectionString}",
-                queue,
-                new DefaultAzureCredential()))
+            .Transport(t => t.UseAzureServiceBus($"Endpoint={ConnectionString}", queue, new DefaultAzureCredential()))
             .InjectMessageId()
+            .UseCustomTypeNameForTopicName()
             .Serialization(s => s.UseCloudEvents()
-                .WithTypes(t => t.Map<UserLoggedIn>("loggedIn"))
-                .WithJsonOptions(options => options.PropertyNameCaseInsensitive = true))
+                .AddWithCustomName<UserLoggedIn>("io.cloudevents.demo.user.loggedIn"))
             .Logging(l => l.MicrosoftExtensionsLogging(_output.ToLoggerFactory()))
             .Start();
         await subscriber.Subscribe<UserLoggedIn>();
 
         // Act
-        await Publish(ConnectionString, "cloudeventify.rebus.integrationtests/cloudeventify.rebus.integrationtests.fromazureservicebus_userloggedin", message);
+        await Publish(ConnectionString, "io/cloudevents/demo/user/loggedIn", message);
 
         // Assert
         await hypothesis.Validate(5.Seconds());
@@ -66,7 +63,7 @@ public class FromAzureServiceBus
         await using var client = new ServiceBusClient(connectionString, new DefaultAzureCredential());
         var sender = client.CreateSender(topic);
 
-        await sender.SendMessageAsync(new ServiceBusMessage(new BinaryData(new CloudEvent("cloudeventify", "loggedIn", message)))
+        await sender.SendMessageAsync(new ServiceBusMessage(new BinaryData(new CloudEvent("cloudeventify", "io.cloudevents.demo.user.loggedIn", message)))
         {
             ContentType = "application/cloudevents+json"
         });

@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Bogus;
 using CloudEventify.Dapr;
@@ -12,7 +13,6 @@ using Wrapr;
 using Xunit;
 using Xunit.Abstractions;
 using Dapr.Client;
-using Configure = Rebus.Config.Configure;
 
 namespace CloudEventify.Rebus.IntegrationTests;
 
@@ -44,9 +44,9 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
             .Register(hypothesis.AsHandler);
         var subscriber = Configure.With(activator)
             .Transport(t => t.UseRabbitMq(_container.ConnectionString, queue))
-            .Serialization(s => s.UseCloudEvents()
-                .WithTypes(t => t.Map<UserLoggedIn>("loggedIn"))
-                .WithJsonOptions(options => options.PropertyNameCaseInsensitive = true))
+            .Serialization(s => s.UseCloudEvents(new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+                .AddWithCustomName<UserLoggedIn>("loggedIn"))
+            .UseCustomTypeNameForTopicName()
             .Logging(l => l.MicrosoftExtensionsLogging(_output.ToLoggerFactory()))
             .Start();
         await subscriber.Subscribe<UserLoggedIn>();

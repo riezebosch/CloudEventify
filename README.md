@@ -17,7 +17,20 @@
 Configure.With(new EmptyActivator())
     .Transport(t => t.UseRabbitMqAsOneWayClient(_container.ConnectionString))
     .Serialization(s => s.UseCloudEvents()
-        .WithTypes(types => types.Map<UserLoggedIn>("loggedIn")))
+        .AddWithCustomName<UserLoggedIn>("io.cloudevents.demo.user.loggedIn") // explicit
+        .AddWithShortName<UserLoggedIn>()) // or with short name
+    .Start();
+```
+
+### Rebus + Azure Service Bus
+
+```csharp
+Configure.With(activator)
+    .Transport(t => t.UseAzureServiceBus($"Endpoint={ConnectionString}", queue, new DefaultAzureCredential()))
+    .InjectMessageId() // <-- req'd when receiving messages from another source than rebus
+    .Serialization(s => s.UseCloudEvents()
+        .AddWithCustomName<UserLoggedIn>("io.cloudevents.demo.user.loggedIn")) // <-- all types _must_ be mapped explicitly, either by short name or custom name
+    .UseCustomTypeNameForTopicName() // <-- replaces "." with "/" to mimic nested resources, io/cloudevents/demo/user/loggedIn
     .Start();
 ```
 
@@ -63,24 +76,12 @@ Used by the deserializer when you want to deserialize to a specific (sub)type.
 
 ## Subject
 
-The subject can be constructed using the instance of the outgoing message.
+The subject can be constructed using the instance of the outgoing message (currently not available for Rebus).
 
 ```c#
 .UseCloudEvents()
     .WithTypes(t => t.Map<UserLoggedIn>("loggedIn"), map => map with { Subject = x => x.SomeProperty });
 ```
-
-## Source 
-
-For [Rebus](Rebus) you can also specify the `Source` attribute to be applied on the outgoing cloud event:
-
-```c#
-.Serialization(s => s.UseCloudEvents()
-    .WithTypes(types => types.Map<UserLoggedIn>("user.loggedIn"))
-    .WithSource(new System.Uri("uri:MySourceApp")))
-```
-
-Using [MassTransit](MassTransit) the `Source` attribute is used from the `SendContext`.
 
 ## Limitations
 

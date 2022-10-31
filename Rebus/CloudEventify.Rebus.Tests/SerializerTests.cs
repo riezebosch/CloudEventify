@@ -1,11 +1,11 @@
 using System.Threading.Tasks;
-using CloudEventify.Rebus;
 using FluentAssertions.Extensions;
 using Hypothesist;
 using Hypothesist.Rebus;
 using Rebus.Activation;
 using Rebus.Bus;
 using Rebus.Config;
+using Rebus.Messages.Control;
 using Rebus.Persistence.InMem;
 using Rebus.Routing.TypeBased;
 using Rebus.Transport.InMem;
@@ -30,8 +30,8 @@ public class SerializerTests
             .Subscriptions(s => s.StoreInMemory())
             .Routing(r => r.TypeBased().Map<A.UserLoggedIn>("user"))
             .Serialization(s => s.UseCloudEvents()
-                .WithTypes(types => types.Map<A.UserLoggedIn>("user.loggedIn", m => m with { Subject = x => $"user/{x.Id}" }))
-                .WithSource(new System.Uri("uri:MySourceApp")))
+                .AddWithCustomName<A.UserLoggedIn>("user.loggedIn")
+                .AddWithShortName<SubscribeRequest>())
             .Start();
 
         await bus.Subscribe<A.UserLoggedIn>();
@@ -70,10 +70,7 @@ public class SerializerTests
             .Transport(s => s.UseInMemoryTransport(network, "producer"))
             .Subscriptions(s => s.StoreInMemory())
             .Routing(r => r.TypeBased().Map<int>("consumer"))
-            .Serialization(s => s.UseCloudEvents()
-                .WithTypes(types => types
-                    .Map<int>("int")
-                    .Map<B.UserLoggedIn>("user.loggedIn")))
+            .Serialization(s => s.UseCloudEvents().AddWithCustomName<int>("int").AddWithCustomName<B.UserLoggedIn>("user.loggedIn"))
             .Start();
 
     private static IBus Consumer(IHandlerActivator activator, InMemNetwork network) =>
@@ -83,9 +80,9 @@ public class SerializerTests
             .Subscriptions(s => s.StoreInMemory())
             .Routing(r => r.TypeBased().Map<int>("consumer"))
             .Serialization(s => s.UseCloudEvents()
-                .WithTypes(types => types
-                    .Map<int>("int")
-                    .Map<A.UserLoggedIn>("user.loggedIn")))
+                .AddWithShortName<SubscribeRequest>()
+                .AddWithCustomName<int>("int")
+                .AddWithCustomName<A.UserLoggedIn>("user.loggedIn"))
             .Start();
 
     private static class A
