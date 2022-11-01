@@ -27,10 +27,10 @@ Configure.With(new EmptyActivator())
 ```csharp
 Configure.With(activator)
     .Transport(t => t.UseAzureServiceBus($"Endpoint={ConnectionString}", queue, new DefaultAzureCredential()))
-    .InjectMessageId() // <-- req'd when receiving messages from another source than rebus
+    .Options(o => o.InjectMessageId()) // <-- req'd when receiving messages from another source than rebus
+    .Options(o => o.UseCustomTypeNameForTopicName()) // <-- replaces "." with "/" to mimic nested resources, io/cloudevents/demo/user/loggedIn
     .Serialization(s => s.UseCloudEvents()
         .AddWithCustomName<UserLoggedIn>("io.cloudevents.demo.user.loggedIn")) // <-- all types _must_ be mapped explicitly, either by short name or custom name
-    .UseCustomTypeNameForTopicName() // <-- replaces "." with "/" to mimic nested resources, io/cloudevents/demo/user/loggedIn
     .Start();
 ```
 

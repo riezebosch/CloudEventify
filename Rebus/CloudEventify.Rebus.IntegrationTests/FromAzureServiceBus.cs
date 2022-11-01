@@ -40,8 +40,8 @@ public class FromAzureServiceBus
             .Register(hypothesis.AsHandler);
         using var subscriber = Configure.With(activator)
             .Transport(t => t.UseAzureServiceBus($"Endpoint={ConnectionString}", queue, new DefaultAzureCredential()))
-            .InjectMessageId()
-            .UseCustomTypeNameForTopicName()
+            .Options(o => o.InjectMessageId())
+            .Options(o => o.UseCustomTypeNameForTopicName())
             .Serialization(s => s.UseCloudEvents()
                 .AddWithCustomName<UserLoggedIn>("io.cloudevents.demo.user.loggedIn"))
             .Logging(l => l.MicrosoftExtensionsLogging(_output.ToLoggerFactory()))

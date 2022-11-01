@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Rebus.Config;
 using Rebus.Pipeline;
-using Rebus.Retry.Simple;
 using Rebus.Serialization;
 using Rebus.Serialization.Custom;
 using Rebus.Topic;
@@ -11,7 +10,7 @@ namespace CloudEventify.Rebus;
 public static class Factory
 {
     /// <summary>
-    /// 
+    /// Use cloud events to wrap incoming and outgoing messages and be interoperable with the rest of the world.
     /// </summary>
     /// <param name="configurer"></param>
     /// <param name="options"></param>
@@ -26,13 +25,13 @@ public static class Factory
     /// <summary>
     /// Injects a pseudo random message id for incoming messages not published by rebus. 
     /// </summary>
-    public static RebusConfigurer InjectMessageId(this RebusConfigurer configurer) => configurer.Options(o => 
-        o.Decorate<IPipeline>(c => new PipelineStepInjector(c.Get<IPipeline>())
-            .OnReceive(new PseudoMessageId(), PipelineRelativePosition.Before, typeof(SimpleRetryStrategyStep))));
+    public static void InjectMessageId(this OptionsConfigurer configurer) => 
+        configurer.Decorate<IPipeline>(c => new PipelineStepConcatenator(c.Get<IPipeline>())
+            .OnReceive(new PseudoMessageId(), PipelineAbsolutePosition.Front));
 
     /// <summary>
     /// Use the configured custom type names for topic name and replaces "." with "/" to mimic nested resources.
     /// </summary>
-    public static RebusConfigurer UseCustomTypeNameForTopicName(this RebusConfigurer configurer) => configurer
-        .Options(o => o.Decorate<ITopicNameConvention>(c => new TopicNames(c.Get<IMessageTypeNameConvention>())));
+    public static void UseCustomTypeNameForTopicName(this OptionsConfigurer configurer) => 
+        configurer.Decorate<ITopicNameConvention>(c => new TopicNames(c.Get<IMessageTypeNameConvention>()));
 }

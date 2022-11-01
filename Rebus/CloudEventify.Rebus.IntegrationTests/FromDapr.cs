@@ -46,7 +46,8 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
             .Transport(t => t.UseRabbitMq(_container.ConnectionString, queue))
             .Serialization(s => s.UseCloudEvents(new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
                 .AddWithCustomName<UserLoggedIn>("loggedIn"))
-            .UseCustomTypeNameForTopicName()
+            .Options(o => o.InjectMessageId()) // <-- currently not req'd for RabbitMQ but want to include it in the test anyway
+            .Options(o => o.UseCustomTypeNameForTopicName())
             .Logging(l => l.MicrosoftExtensionsLogging(_output.ToLoggerFactory()))
             .Start();
         await subscriber.Subscribe<UserLoggedIn>();
