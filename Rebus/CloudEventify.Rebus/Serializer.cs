@@ -36,7 +36,7 @@ internal class Serializer : ISerializer
         new(CloudEventsSpecVersion.V1_0)
         {
             Id = message.GetMessageId(),
-            Subject = null,
+            Subject = message.GetMessageLabel(),
             Source = message.Headers.TryGetValue(Headers.SenderAddress, out var source)
                 ? new Uri(source, UriKind.Relative)
                 : new Uri("cloudeventify:rebus"),

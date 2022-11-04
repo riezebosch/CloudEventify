@@ -33,6 +33,7 @@ public class ToAzureServiceBus : IAsyncLifetime
         var hypothesis = Hypothesis.For<CloudEvent>()
             .Any(m => m.Source == "jsdflkjsdf")
             .Any(x => x.Data.ToString().Contains(message.Id))
+            .Any(x => x.Subject != null)
             .Any(x => x.ExtensionAttributes.ContainsKey("traceparent"))
             .Any(x => x.Source == "jsdflkjsdf");
 
