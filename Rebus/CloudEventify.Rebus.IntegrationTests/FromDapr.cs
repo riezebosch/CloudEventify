@@ -5,14 +5,15 @@ using Bogus;
 using CloudEventify.Dapr;
 using FluentAssertions.Extensions;
 using Hypothesist;
-using Hypothesist.Rebus;
-using RabbitMQ.Client;
 using Rebus.Activation;
 using Rebus.Config;
 using Wrapr;
 using Xunit;
 using Xunit.Abstractions;
 using Dapr.Client;
+using RabbitMQ.Client;
+using Rebus.Pipeline;
+using Headers = Rebus.Messages.Headers;
 
 namespace CloudEventify.Rebus.IntegrationTests;
 
@@ -37,11 +38,12 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
         
         var message = Message();
         var hypothesis = Hypothesis
-            .For<UserLoggedIn>()
-            .Any(x => x == message);
+            .For<(IMessageContext c, UserLoggedIn m)>()
+            .Any(x => x.m == message)
+            .Any(x => x.c.Headers[Headers.SenderAddress] == "cloudeventify:dapr");
 
         var activator = new BuiltinHandlerActivator()
-            .Register(hypothesis.AsHandler);
+            .Handle<UserLoggedIn>(async (_, c, m) => await hypothesis.Test((c, m)));
         var subscriber = Configure.With(activator)
             .Transport(t => t.UseRabbitMq(_container.ConnectionString, queue))
             .Serialization(s => s.UseCloudEvents(new JsonSerializerOptions { PropertyNameCaseInsensitive = true })

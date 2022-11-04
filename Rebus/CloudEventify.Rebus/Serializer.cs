@@ -36,12 +36,10 @@ internal class Serializer : ISerializer
     Task<Message> ISerializer.Deserialize(TransportMessage transportMessage)
     {
         var cloudEvent = _formatter.Decode(transportMessage.Body);
-        var headers = new Dictionary<string, string>
-        {
-            [Headers.MessageId] = cloudEvent.Id!,
-            [Headers.Type] = cloudEvent.Type!
-        };
-
-        return Task.FromResult(new Message(headers, ((JsonElement)cloudEvent.Data!).Deserialize(_convention.GetType(cloudEvent.Type!), _options)!));
+        transportMessage.Headers[Headers.MessageId] = cloudEvent.Id!;
+        transportMessage.Headers[Headers.Type] = cloudEvent.Type!;
+        transportMessage.Headers[Headers.SenderAddress] = cloudEvent.Source!.ToString();
+        
+        return Task.FromResult(new Message(transportMessage.Headers, ((JsonElement)cloudEvent.Data!).Deserialize(_convention.GetType(cloudEvent.Type!), _options)!));
     }
 }
