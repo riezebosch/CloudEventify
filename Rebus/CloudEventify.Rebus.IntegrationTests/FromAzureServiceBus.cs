@@ -6,9 +6,10 @@ using Azure.Messaging.ServiceBus;
 using Bogus;
 using FluentAssertions.Extensions;
 using Hypothesist;
-using Hypothesist.Rebus;
 using Rebus.Activation;
 using Rebus.Config;
+using Rebus.Messages;
+using Rebus.Pipeline;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -33,11 +34,12 @@ public class FromAzureServiceBus
 
         var message = Message();
         var hypothesis = Hypothesis
-            .For<UserLoggedIn>()
-            .Any(x => x == message);
+            .For<(IMessageContext c, UserLoggedIn m)>()
+            .Any(x => x.m == message)
+            .Any(x => x.c.Headers[Headers.SenderAddress] == "cloudeventify:somewhere");
 
         using var activator = new BuiltinHandlerActivator()
-            .Register(hypothesis.AsHandler);
+            .Handle<UserLoggedIn>(async (_, c, m) => await hypothesis.Test((c, m)));
         using var subscriber = Configure.With(activator)
             .Transport(t => t.UseAzureServiceBus($"Endpoint={ConnectionString}", queue, new DefaultAzureCredential()))
             .Options(o => o.InjectMessageId())
@@ -63,7 +65,7 @@ public class FromAzureServiceBus
         await using var client = new ServiceBusClient(connectionString, new DefaultAzureCredential());
         var sender = client.CreateSender(topic);
 
-        await sender.SendMessageAsync(new ServiceBusMessage(new BinaryData(new CloudEvent("cloudeventify", "io.cloudevents.demo.user.loggedIn", message)))
+        await sender.SendMessageAsync(new ServiceBusMessage(new BinaryData(new CloudEvent("cloudeventify:somewhere", "io.cloudevents.demo.user.loggedIn", message)))
         {
             ContentType = "application/cloudevents+json"
         });
