@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using FluentAssertions.Extensions;
 using Hypothesist;
@@ -15,6 +16,32 @@ namespace CloudEventify.Rebus.Tests;
 
 public class SerializerTests
 {
+    [Fact]
+    public async Task Send_With_Source_override()
+    {
+        var hypothesis = Hypothesis.For<A.UserLoggedIn>()
+            .Any(x => x.Id == 1234);
+
+        using var activator = new BuiltinHandlerActivator();
+        activator.Register(hypothesis.AsHandler);
+
+        var bus = Configure
+            .With(activator)
+            .Transport(s => s.UseInMemoryTransport(new InMemNetwork(), "user"))
+            .Subscriptions(s => s.StoreInMemory())
+            .Routing(r => r.TypeBased().Map<A.UserLoggedIn>("user"))
+            .Serialization(s => s.UseCloudEvents(null,  new Uri("app://my.soureapp.com"))
+                .AddWithCustomName<A.UserLoggedIn>("user.loggedIn")
+                .AddWithShortName<SubscribeRequest>())
+            .Start();
+
+        await bus.Subscribe<A.UserLoggedIn>();
+        await bus.Send(new A.UserLoggedIn(1234));
+
+        await hypothesis.Validate(2.Seconds());
+    }
+
+
     [Fact]
     public async Task Send()
     {
