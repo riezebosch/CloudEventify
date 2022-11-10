@@ -10,8 +10,12 @@
     <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="6.5.1" />
         <PackageReference Include="Hypothesist.Rebus" Version="2.0.30" />
+        <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.3.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.2" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
         <PackageReference Include="Rebus" Version="6.6.5" />
+        <PackageReference Include="Rebus.Microsoft.Extensions.Logging" Version="2.0.0" />
+        <PackageReference Include="Rebus.ServiceProvider" Version="8.4.0" />
         <PackageReference Include="xunit" Version="2.4.2" />
         <PackageReference Include="xunit.extensibility.core" Version="2.4.2" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">

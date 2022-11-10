@@ -2,6 +2,8 @@ using System.Threading.Tasks;
 using FluentAssertions.Extensions;
 using Hypothesist;
 using Hypothesist.Rebus;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Rebus.Activation;
 using Rebus.Bus;
 using Rebus.Config;
@@ -10,11 +12,57 @@ using Rebus.Persistence.InMem;
 using Rebus.Routing.TypeBased;
 using Rebus.Transport.InMem;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace CloudEventify.Rebus.Tests;
 
 public class SerializerTests
 {
+    private readonly ITestOutputHelper _output;
+
+    public SerializerTests(ITestOutputHelper output) => 
+        _output = output;
+
+    [Fact]
+    public async Task Publish()
+    {
+        var hypothesis = Hypothesis.For<A.UserLoggedIn>()
+            .Any(x => x.Id == 1234);
+        
+        var network = new InMemNetwork(true);
+        var subscribers = new InMemorySubscriberStore();
+
+        var builder = WebApplication.CreateBuilder();
+        builder.Services
+            .AddSingleton(hypothesis.AsHandler())
+            .AddRebus(configure => configure
+            .Transport(s => s.UseInMemoryTransport(network, "a"))
+            .Subscriptions(s => s.StoreInMemory(subscribers))
+            .Routing(r => r.TypeBased()
+                .Map<A.UserLoggedIn>("b"))
+            .Serialization(s => s.UseCloudEvents()
+                .AddWithCustomName<A.UserLoggedIn>("user.loggedIn")
+                .AddWithShortName<SubscribeRequest>())
+            .Logging(l => l.MicrosoftExtensionsLogging(_output.ToLoggerFactory())),
+                onCreated: async bus => await bus.Subscribe<A.UserLoggedIn>());
+
+        await using var app = builder.Build();
+        await app.StartAsync();
+            
+        var producer = Configure
+            .With(new BuiltinHandlerActivator())
+            .Transport(s => s.UseInMemoryTransport(network, "c"))
+            .Subscriptions(s => s.StoreInMemory(subscribers))
+            .Serialization(s => s.UseCloudEvents()
+                .AddWithCustomName<A.UserLoggedIn>("user.loggedIn"))
+            .Logging(l => l.MicrosoftExtensionsLogging(_output.ToLoggerFactory()))
+            .Start();
+
+        await producer.Publish(new A.UserLoggedIn(1234));
+        
+        await hypothesis.Validate(2.Seconds());
+    }
+    
     [Fact]
     public async Task Send()
     {
@@ -70,7 +118,9 @@ public class SerializerTests
             .Transport(s => s.UseInMemoryTransport(network, "producer"))
             .Subscriptions(s => s.StoreInMemory())
             .Routing(r => r.TypeBased().Map<int>("consumer"))
-            .Serialization(s => s.UseCloudEvents().AddWithCustomName<int>("int").AddWithCustomName<B.UserLoggedIn>("user.loggedIn"))
+            .Serialization(s => s.UseCloudEvents()
+                .AddWithCustomName<int>("int")
+                .AddWithCustomName<B.UserLoggedIn>("user.loggedIn"))
             .Start();
 
     private static IBus Consumer(IHandlerActivator activator, InMemNetwork network) =>
