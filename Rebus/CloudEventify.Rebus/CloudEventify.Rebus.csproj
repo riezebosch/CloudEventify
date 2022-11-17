@@ -20,7 +20,7 @@
         <NeutralLanguage>en-US</NeutralLanguage>
         <PackageId>CloudEventify.Rebus</PackageId>
         <Description>Use cloud events for pub/sub with Rebus.</Description>
-        <PackageReleaseNotes>netstandard2.1</PackageReleaseNotes>
+        <PackageReleaseNotes>mapping traceparent extension attribute to correleation id</PackageReleaseNotes>
         <PackageTags>cloudevents;cloud;events;rebus</PackageTags>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <PackageReadmeFile>README.md</PackageReadmeFile>

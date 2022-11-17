@@ -33,7 +33,8 @@ public class ToAzureServiceBus : IAsyncLifetime
         var message = Message();
         var hypothesis = Hypothesis.For<CloudEvent>()
             .Any(m => m.Source == "jsdflkjsdf")
-            .Any(x => x.Data.ToString().Contains(message.Id));
+            .Any(x => x.Data.ToString().Contains(message.Id))
+            .Any(x => x.ExtensionAttributes.ContainsKey("traceparent"));
 
         using var subscriber = Configure.With(new EmptyActivator())
             .Transport(t => t.UseAzureServiceBus($"Endpoint={ConnectionString}", "jsdflkjsdf", new DefaultAzureCredential()))

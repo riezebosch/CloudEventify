@@ -40,7 +40,8 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
         var hypothesis = Hypothesis
             .For<(IMessageContext c, UserLoggedIn m)>()
             .Any(x => x.m == message)
-            .Any(x => x.c.Headers[Headers.SenderAddress] == "cloudeventify:dapr");
+            .Any(x => x.c.Headers[Headers.SenderAddress] == "cloudeventify:dapr")
+            .Any(x => x.c.Headers.ContainsKey(Headers.CorrelationId));
 
         var activator = new BuiltinHandlerActivator()
             .Handle<UserLoggedIn>(async (_, c, m) => await hypothesis.Test((c, m)));
