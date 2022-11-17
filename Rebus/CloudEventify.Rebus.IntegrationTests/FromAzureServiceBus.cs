@@ -36,7 +36,8 @@ public class FromAzureServiceBus
         var hypothesis = Hypothesis
             .For<(IMessageContext c, UserLoggedIn m)>()
             .Any(x => x.m == message)
-            .Any(x => x.c.Headers[Headers.SenderAddress] == "cloudeventify:somewhere");
+            .Any(x => x.c.Headers[Headers.SenderAddress] == "cloudeventify:somewhere")
+            .Any(x => x.c.Headers[Headers.CorrelationId] == "some-correlation-id");
 
         using var activator = new BuiltinHandlerActivator()
             .Handle<UserLoggedIn>(async (_, c, m) => await hypothesis.Test((c, m)));
@@ -65,7 +66,10 @@ public class FromAzureServiceBus
         await using var client = new ServiceBusClient(connectionString, new DefaultAzureCredential());
         var sender = client.CreateSender(topic);
 
-        await sender.SendMessageAsync(new ServiceBusMessage(new BinaryData(new CloudEvent("cloudeventify:somewhere", "io.cloudevents.demo.user.loggedIn", message)))
+        var cloudEvent = new CloudEvent("cloudeventify:somewhere", "io.cloudevents.demo.user.loggedIn", message);
+        cloudEvent.ExtensionAttributes["traceparent"] = "some-correlation-id";
+        
+        await sender.SendMessageAsync(new ServiceBusMessage(new BinaryData(cloudEvent))
         {
             ContentType = "application/cloudevents+json"
         });
