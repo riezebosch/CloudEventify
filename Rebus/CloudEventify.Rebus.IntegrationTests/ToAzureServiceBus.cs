@@ -4,7 +4,6 @@ using Azure.Messaging;
 using Azure.Messaging.ServiceBus;
 using Azure.Messaging.ServiceBus.Administration;
 using Bogus;
-using FluentAssertions;
 using FluentAssertions.Extensions;
 using Hypothesist;
 using Rebus.Config;
@@ -16,7 +15,7 @@ namespace CloudEventify.Rebus.IntegrationTests;
 public class ToAzureServiceBus : IAsyncLifetime
 {
     private const string ConnectionString = "sbmanuel.servicebus.windows.net";
-    private const string Topic = "io/cloudevents/demo/user/loggedIn";
+    private const string Topic = "io.cloudevents.demo.user.loggedIn";
     private const string Subscription = "integration-test";
     private readonly ITestOutputHelper _output;
 
@@ -40,7 +39,7 @@ public class ToAzureServiceBus : IAsyncLifetime
             .Transport(t => t.UseAzureServiceBus($"Endpoint={ConnectionString}", "jsdflkjsdf", new DefaultAzureCredential()))
             .Options(o => o.UseCustomTypeNameForTopicName())
             .Serialization(s => s.UseCloudEvents()
-                .AddWithCustomName<UserLoggedIn>("io.cloudevents.demo.user.loggedIn"))
+                .AddWithCustomName<UserLoggedIn>(Topic))
             .Logging(l => l.MicrosoftExtensionsLogging(_output.ToLoggerFactory()))
             .Start();
 
@@ -65,7 +64,7 @@ public class ToAzureServiceBus : IAsyncLifetime
             .Transport(t => t.UseAzureServiceBusAsOneWayClient($"Endpoint={ConnectionString}", new DefaultAzureCredential()))
             .Options(o => o.UseCustomTypeNameForTopicName())
             .Serialization(s => s.UseCloudEvents()
-                .AddWithCustomName<UserLoggedIn>("io.cloudevents.demo.user.loggedIn"))
+                .AddWithCustomName<UserLoggedIn>(Topic))
             .Logging(l => l.MicrosoftExtensionsLogging(_output.ToLoggerFactory()))
             .Start();
 

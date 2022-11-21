@@ -20,7 +20,7 @@
         <NeutralLanguage>en-US</NeutralLanguage>
         <PackageId>CloudEventify.Rebus</PackageId>
         <Description>Use cloud events for pub/sub with Rebus.</Description>
-        <PackageReleaseNotes>mapping traceparent extension attribute to correleation id</PackageReleaseNotes>
+        <PackageReleaseNotes>BREAKING CHANGE: using custom type name for topic names no longer replaces `.` with `/`.</PackageReleaseNotes>
         <PackageTags>cloudevents;cloud;events;rebus</PackageTags>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <PackageReadmeFile>README.md</PackageReadmeFile>

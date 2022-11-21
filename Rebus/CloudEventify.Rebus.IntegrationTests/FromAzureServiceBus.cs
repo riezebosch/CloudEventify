@@ -18,6 +18,7 @@ namespace CloudEventify.Rebus.IntegrationTests;
 public class FromAzureServiceBus
 {
     private const string ConnectionString = "sbmanuel.servicebus.windows.net";
+    private const string Topic = "io.cloudevents.demo.user.loggedIn";
     private readonly ITestOutputHelper _output;
 
     public FromAzureServiceBus(ITestOutputHelper output) => 
@@ -46,13 +47,13 @@ public class FromAzureServiceBus
             .Options(o => o.InjectMessageId())
             .Options(o => o.UseCustomTypeNameForTopicName())
             .Serialization(s => s.UseCloudEvents()
-                .AddWithCustomName<UserLoggedIn>("io.cloudevents.demo.user.loggedIn"))
+                .AddWithCustomName<UserLoggedIn>(Topic))
             .Logging(l => l.MicrosoftExtensionsLogging(_output.ToLoggerFactory()))
             .Start();
         await subscriber.Subscribe<UserLoggedIn>();
 
         // Act
-        await Publish(ConnectionString, "io/cloudevents/demo/user/loggedIn", message);
+        await Publish(ConnectionString, Topic, message);
 
         // Assert
         await hypothesis.Validate(5.Seconds());
@@ -66,12 +67,13 @@ public class FromAzureServiceBus
         await using var client = new ServiceBusClient(connectionString, new DefaultAzureCredential());
         var sender = client.CreateSender(topic);
 
-        var cloudEvent = new CloudEvent("cloudeventify:somewhere", "io.cloudevents.demo.user.loggedIn", message);
+        var cloudEvent = new CloudEvent("cloudeventify:somewhere", topic, message);
         cloudEvent.ExtensionAttributes["traceparent"] = "some-correlation-id";
         
         await sender.SendMessageAsync(new ServiceBusMessage(new BinaryData(cloudEvent))
         {
-            ContentType = "application/cloudevents+json"
+            ContentType = "application/cloudevents+json",
+            To = topic
         });
     }
 
