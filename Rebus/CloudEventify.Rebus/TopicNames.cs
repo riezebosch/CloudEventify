@@ -11,5 +11,5 @@ internal class TopicNames : ITopicNameConvention
         _convention = convention;
 
     public string GetTopic(Type eventType) => 
-        _convention.GetTypeName(eventType).Replace(".", "/");
+        _convention.GetTypeName(eventType);
 }
