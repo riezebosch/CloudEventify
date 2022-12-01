@@ -37,10 +37,9 @@ public class ToAzureServiceBus : IAsyncLifetime
 
         using var subscriber = Configure.With(new EmptyActivator())
             .Transport(t => t.UseAzureServiceBus($"Endpoint={ConnectionString}", "jsdflkjsdf", new DefaultAzureCredential()))
-            .Options(o => o
-                .UseCustomTypeNameForTopicName()
-                .RemoveOutgoingRebusHeaders())
-            .Serialization(s => s.UseCloudEvents()
+            .Options(o => o.UseCustomTypeNameForTopicName())
+            .Serialization(s => s
+                .UseCloudEvents()
                 .AddWithCustomName<UserLoggedIn>(Topic))
             .Logging(l => l.MicrosoftExtensionsLogging(_output.ToLoggerFactory()))
             .Start();
@@ -64,9 +63,7 @@ public class ToAzureServiceBus : IAsyncLifetime
 
         using var subscriber = Configure.With(new EmptyActivator())
             .Transport(t => t.UseAzureServiceBusAsOneWayClient($"Endpoint={ConnectionString}", new DefaultAzureCredential()))
-            .Options(o => o
-                .UseCustomTypeNameForTopicName()
-                .RemoveOutgoingRebusHeaders())
+            .Options(o => o.UseCustomTypeNameForTopicName())
             .Serialization(s => s
                 .UseCloudEvents()
                 .AddWithCustomName<UserLoggedIn>(Topic))
