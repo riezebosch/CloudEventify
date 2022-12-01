@@ -44,8 +44,10 @@ public class FromAzureServiceBus
             .Handle<UserLoggedIn>(async (_, c, m) => await hypothesis.Test((c, m)));
         using var subscriber = Configure.With(activator)
             .Transport(t => t.UseAzureServiceBus($"Endpoint={ConnectionString}", queue, new DefaultAzureCredential()))
-            .Options(o => o.InjectMessageId())
-            .Options(o => o.UseCustomTypeNameForTopicName())
+            .Options(o => o
+                .UseCustomTypeNameForTopicName()
+                .RemoveOutgoingRebusHeaders()
+                .InjectMessageId())
             .Serialization(s => s.UseCloudEvents()
                 .AddWithCustomName<UserLoggedIn>(Topic))
             .Logging(l => l.MicrosoftExtensionsLogging(_output.ToLoggerFactory()))

@@ -25,13 +25,35 @@ public static class Factory
     /// <summary>
     /// Injects a pseudo random message id for incoming messages not published by rebus. 
     /// </summary>
-    public static void InjectMessageId(this OptionsConfigurer configurer) => 
-        configurer.Decorate<IPipeline>(c => new PipelineStepConcatenator(c.Get<IPipeline>())
+    public static OptionsConfigurer InjectMessageId(this OptionsConfigurer options)
+    {
+        options
+            .Decorate<IPipeline>(c => new PipelineStepConcatenator(c.Get<IPipeline>())
             .OnReceive(new PseudoMessageId(), PipelineAbsolutePosition.Front));
+        return options;
+    }
 
     /// <summary>
     /// Use the configured custom type names for topic name and replaces "." with "/" to mimic nested resources.
     /// </summary>
-    public static void UseCustomTypeNameForTopicName(this OptionsConfigurer configurer) => 
-        configurer.Decorate<ITopicNameConvention>(c => new TopicNames(c.Get<IMessageTypeNameConvention>()));
+    public static OptionsConfigurer UseCustomTypeNameForTopicName(this OptionsConfigurer options)
+    {
+        options.Decorate<ITopicNameConvention>(c => new TopicNames(c.Get<IMessageTypeNameConvention>()));
+        return options;
+    }
+
+    /// <summary>
+    /// Removes all rbs2-* headers from the transport.
+    /// <remarks>
+    /// This implies that <see cref="InjectMessageId"/> is enabled on the consumer side!
+    /// Not to be used (currently) in request/reply scenarios.
+    /// </remarks>
+    /// </summary>
+    public static OptionsConfigurer RemoveOutgoingRebusHeaders(this OptionsConfigurer options)
+    {
+        options
+            .Decorate<IPipeline>(c => new PipelineStepConcatenator(c.Get<IPipeline>())
+            .OnSend(new RemoveRebusHeaders(), PipelineAbsolutePosition.Back));
+        return options;
+    }
 }

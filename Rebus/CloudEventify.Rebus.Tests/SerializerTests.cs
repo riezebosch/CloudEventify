@@ -38,6 +38,7 @@ public class SerializerTests
             .AddRebus(configure => configure
             .Transport(s => s.UseInMemoryTransport(network, "a"))
             .Subscriptions(s => s.StoreInMemory(subscribers))
+            .Options(o => o.InjectMessageId())
             .Routing(r => r.TypeBased()
                 .Map<A.UserLoggedIn>("b"))
             .Serialization(s => s.UseCloudEvents()
@@ -56,6 +57,7 @@ public class SerializerTests
             .Serialization(s => s.UseCloudEvents()
                 .AddWithCustomName<A.UserLoggedIn>("user.loggedIn"))
             .Logging(l => l.MicrosoftExtensionsLogging(_output.ToLoggerFactory()))
+            .Options(o => o.RemoveOutgoingRebusHeaders())
             .Start();
 
         await producer.Publish(new A.UserLoggedIn(1234));
@@ -77,7 +79,11 @@ public class SerializerTests
             .Transport(s => s.UseInMemoryTransport(new InMemNetwork(), "user"))
             .Subscriptions(s => s.StoreInMemory())
             .Routing(r => r.TypeBased().Map<A.UserLoggedIn>("user"))
-            .Serialization(s => s.UseCloudEvents()
+            .Options(o => o
+                .RemoveOutgoingRebusHeaders()
+                .InjectMessageId())
+            .Serialization(s => s
+                .UseCloudEvents()
                 .AddWithCustomName<A.UserLoggedIn>("user.loggedIn")
                 .AddWithShortName<SubscribeRequest>())
             .Start();
@@ -118,6 +124,7 @@ public class SerializerTests
             .Transport(s => s.UseInMemoryTransport(network, "producer"))
             .Subscriptions(s => s.StoreInMemory())
             .Routing(r => r.TypeBased().Map<int>("consumer"))
+            // .Options(o => o.RemoveOutgoingRebusHeaders())
             .Serialization(s => s.UseCloudEvents()
                 .AddWithCustomName<int>("int")
                 .AddWithCustomName<B.UserLoggedIn>("user.loggedIn"))
@@ -129,6 +136,7 @@ public class SerializerTests
             .Transport(s => s.UseInMemoryTransport(network, "consumer"))
             .Subscriptions(s => s.StoreInMemory())
             .Routing(r => r.TypeBased().Map<int>("consumer"))
+            .Options(o => o.InjectMessageId())
             .Serialization(s => s.UseCloudEvents()
                 .AddWithShortName<SubscribeRequest>()
                 .AddWithCustomName<int>("int")
