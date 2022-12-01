@@ -29,7 +29,6 @@ Configure.With(activator)
     .Transport(t => t.UseAzureServiceBus($"Endpoint={ConnectionString}", queue, new DefaultAzureCredential()))
     .Options(o => o
         .UseCustomTypeNameForTopicName()
-        .RemoveOutgoingRebusHeaders()
         .InjectMessageId())
     .Serialization(s => s.UseCloudEvents()
         .AddWithCustomName<UserLoggedIn>("io.cloudevents.demo.user.loggedIn")) // <-- all types _must_ be mapped explicitly, either by short name or custom name

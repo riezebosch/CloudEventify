@@ -46,7 +46,6 @@ public class FromAzureServiceBus
             .Transport(t => t.UseAzureServiceBus($"Endpoint={ConnectionString}", queue, new DefaultAzureCredential()))
             .Options(o => o
                 .UseCustomTypeNameForTopicName()
-                .RemoveOutgoingRebusHeaders()
                 .InjectMessageId())
             .Serialization(s => s.UseCloudEvents()
                 .AddWithCustomName<UserLoggedIn>(Topic))

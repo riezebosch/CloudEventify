@@ -41,19 +41,4 @@ public static class Factory
         options.Decorate<ITopicNameConvention>(c => new TopicNames(c.Get<IMessageTypeNameConvention>()));
         return options;
     }
-
-    /// <summary>
-    /// Removes all rbs2-* headers from the transport.
-    /// <remarks>
-    /// This implies that <see cref="InjectMessageId"/> is enabled on the consumer side!
-    /// Not to be used (currently) in request/reply scenarios.
-    /// </remarks>
-    /// </summary>
-    public static OptionsConfigurer RemoveOutgoingRebusHeaders(this OptionsConfigurer options)
-    {
-        options
-            .Decorate<IPipeline>(c => new PipelineStepConcatenator(c.Get<IPipeline>())
-            .OnSend(new RemoveRebusHeaders(), PipelineAbsolutePosition.Back));
-        return options;
-    }
 }
