@@ -43,13 +43,11 @@ public class FromAzureServiceBus
         using var activator = new BuiltinHandlerActivator()
             .Handle<UserLoggedIn>(async (_, c, m) => await hypothesis.Test((c, m)));
         using var subscriber = Configure.With(activator)
+                                        .UseCloudEvents(options => options.UseCustomTypeNameForTopicName()
+                                                                          .InjectMessageId()
+                                                                          .RegisterTypeWithCustomName<UserLoggedIn>(Topic))
             .Transport(t => t.UseAzureServiceBus($"Endpoint={ConnectionString}", queue, new DefaultAzureCredential()))
-            .Options(o => o
-                .UseCustomTypeNameForTopicName()
-                .InjectMessageId())
-            .Serialization(s => s.UseCloudEvents()
-                .AddWithCustomName<UserLoggedIn>(Topic))
-            .Logging(l => l.MicrosoftExtensionsLogging(_output.ToLoggerFactory()))
+                                        .Logging(l => l.MicrosoftExtensionsLogging(_output.ToLoggerFactory()))
             .Start();
         await subscriber.Subscribe<UserLoggedIn>();
 

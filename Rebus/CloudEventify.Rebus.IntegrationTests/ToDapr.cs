@@ -75,7 +75,7 @@ public class ToDapr : IClassFixture<RabbitMqContainer>
     {
         var producer = Configure.With(new EmptyActivator())
             .Transport(t => t.UseRabbitMqAsOneWayClient(_container.ConnectionString))
-            .Serialization(s => s.UseCloudEvents().AddWithCustomName<UserLoggedIn>("loggedIn"))
+            .UseCloudEvents(options => options.RegisterTypeWithCustomName<UserLoggedIn>("loggedIn"))
             .Logging(l => l.MicrosoftExtensionsLogging(logger.ToLoggerFactory()))
             .Start();
 

@@ -40,9 +40,8 @@ public class SerializerTests
             .Subscriptions(s => s.StoreInMemory(subscribers))
             .Routing(r => r.TypeBased()
                 .Map<A.UserLoggedIn>("b"))
-            .Serialization(s => s.UseCloudEvents()
-                .AddWithCustomName<A.UserLoggedIn>("user.loggedIn")
-                .AddWithShortName<SubscribeRequest>())
+            .UseCloudEvents(options => options.RegisterTypeWithCustomName<A.UserLoggedIn>("user.loggedIn")
+                                              .RegisterTypeWithShortName<SubscribeRequest>())
             .Logging(l => l.MicrosoftExtensionsLogging(_output.ToLoggerFactory())),
                 onCreated: async bus => await bus.Subscribe<A.UserLoggedIn>());
 
@@ -53,8 +52,7 @@ public class SerializerTests
             .With(new BuiltinHandlerActivator())
             .Transport(s => s.UseInMemoryTransport(network, "c"))
             .Subscriptions(s => s.StoreInMemory(subscribers))
-            .Serialization(s => s.UseCloudEvents()
-                .AddWithCustomName<A.UserLoggedIn>("user.loggedIn"))
+            .UseCloudEvents(options => options.RegisterTypeWithCustomName<A.UserLoggedIn>("user.loggedIn"))
             .Logging(l => l.MicrosoftExtensionsLogging(_output.ToLoggerFactory()))
             .Start();
 
@@ -77,10 +75,8 @@ public class SerializerTests
             .Transport(s => s.UseInMemoryTransport(new InMemNetwork(), "user"))
             .Subscriptions(s => s.StoreInMemory())
             .Routing(r => r.TypeBased().Map<A.UserLoggedIn>("user"))
-            .Serialization(s => s
-                .UseCloudEvents()
-                .AddWithCustomName<A.UserLoggedIn>("user.loggedIn")
-                .AddWithShortName<SubscribeRequest>())
+            .UseCloudEvents(options => options.RegisterTypeWithCustomName<A.UserLoggedIn>("user.loggedIn")
+                                              .RegisterTypeWithShortName<SubscribeRequest>())
             .Start();
 
         await bus.Subscribe<A.UserLoggedIn>();
@@ -119,9 +115,8 @@ public class SerializerTests
             .Transport(s => s.UseInMemoryTransport(network, "producer"))
             .Subscriptions(s => s.StoreInMemory())
             .Routing(r => r.TypeBased().Map<int>("consumer"))
-            .Serialization(s => s.UseCloudEvents()
-                .AddWithCustomName<int>("int")
-                .AddWithCustomName<B.UserLoggedIn>("user.loggedIn"))
+            .UseCloudEvents(options => options.RegisterTypeWithCustomName<B.UserLoggedIn>("user.loggedIn")
+                                              .RegisterTypeWithCustomName<int>("int"))
             .Start();
 
     private static IBus Consumer(IHandlerActivator activator, InMemNetwork network) =>
@@ -130,10 +125,9 @@ public class SerializerTests
             .Transport(s => s.UseInMemoryTransport(network, "consumer"))
             .Subscriptions(s => s.StoreInMemory())
             .Routing(r => r.TypeBased().Map<int>("consumer"))
-            .Serialization(s => s.UseCloudEvents()
-                .AddWithShortName<SubscribeRequest>()
-                .AddWithCustomName<int>("int")
-                .AddWithCustomName<A.UserLoggedIn>("user.loggedIn"))
+            .UseCloudEvents(options => options.RegisterTypeWithShortName<SubscribeRequest>()
+                                              .RegisterTypeWithCustomName<int>("int")
+                                              .RegisterTypeWithCustomName<A.UserLoggedIn>("user.loggedIn"))
             .Start();
 
     private static class A
