@@ -18,7 +18,7 @@ public static class Factory
     public static CustomTypeNameConventionBuilder UseCloudEvents(this StandardConfigurer<ISerializer> configurer, JsonSerializerOptions? options = null)
     {
         options ??= new JsonSerializerOptions();
-        configurer.Register(c => new Serializer(Formatter.New(options), options, c.Get<IMessageTypeNameConvention>()));
+        configurer.Register(c => new Serializer(Formatter.New(options), options, new SerializerOptions(), c.Get<IMessageTypeNameConvention>()));
         return configurer.UseCustomMessageTypeNames();
     }
 

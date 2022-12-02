@@ -12,6 +12,7 @@ public class CloudEventsOptions
 {
     private readonly RebusConfigurer _configurer;
     internal JsonSerializerOptions JsonSerializerOptions = new();
+    internal SerializerOptions SerializerOptions = new();
 
     public CloudEventsOptions(RebusConfigurer configurer)
     {
@@ -30,6 +31,15 @@ public class CloudEventsOptions
     public CloudEventsOptions With(JsonSerializerOptions serializerOptions)
     {
         JsonSerializerOptions = serializerOptions;
+        return this;
+    }
+
+    public CloudEventsOptions Configure(Action<SerializerOptions> configure)
+    {
+        if (configure is null)
+            throw new ArgumentNullException(nameof(configure));
+
+        configure.Invoke(SerializerOptions);
         return this;
     }
 
@@ -67,6 +77,7 @@ public class CloudEventsOptions
                                          {
                                              config.Register(c => new Serializer(Formatter.New(JsonSerializerOptions),
                                                                                  JsonSerializerOptions,
+                                                                                 SerializerOptions,
                                                                                  c.Get<IMessageTypeNameConvention>()));
                                              var x = config.UseCustomMessageTypeNames();
                                              foreach (var registration in _typeRegistrations)

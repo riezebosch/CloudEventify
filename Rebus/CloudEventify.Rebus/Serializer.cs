@@ -11,13 +11,15 @@ internal class Serializer : ISerializer
     private const string TraceParentExtensionAttribute = "traceparent";
     private readonly CloudEventFormatter _formatter;
     private readonly JsonSerializerOptions _options;
+    private readonly SerializerOptions _serializerOptions;
     private readonly IMessageTypeNameConvention _convention;
 
-    public Serializer(CloudEventFormatter formatter, JsonSerializerOptions options,
+    public Serializer(CloudEventFormatter formatter, JsonSerializerOptions options, SerializerOptions serializerOptions,
         IMessageTypeNameConvention convention)
     {
         _formatter = formatter;
         _options = options;
+        _serializerOptions = serializerOptions;
         _convention = convention;
     }
 
@@ -32,14 +34,14 @@ internal class Serializer : ISerializer
         return Task.FromResult(new Message(transportMessage.Headers, ((JsonElement)cloudEvent.Data!).Deserialize(_convention.GetType(cloudEvent.Type!), _options)!));
     }
 
-    private static CloudEvent ToCloudEvent(Message message) =>
+    private CloudEvent ToCloudEvent(Message message) =>
         new(CloudEventsSpecVersion.V1_0)
         {
             Id = message.GetMessageId(),
             Subject = null,
             Source = message.Headers.TryGetValue(Headers.SenderAddress, out var source)
                 ? new Uri(source, UriKind.Relative)
-                : new Uri("cloudeventify:rebus"),
+                : new Uri(_serializerOptions.Source),
             Data = message.Body,
             Time = DateTimeOffset.Parse(message.Headers[Headers.SentTime]),
             Type = message.Headers[Headers.Type],
