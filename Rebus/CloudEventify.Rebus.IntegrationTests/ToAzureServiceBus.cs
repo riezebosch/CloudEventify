@@ -33,11 +33,14 @@ public class ToAzureServiceBus : IAsyncLifetime
         var hypothesis = Hypothesis.For<CloudEvent>()
             .Any(m => m.Source == "jsdflkjsdf")
             .Any(x => x.Data.ToString().Contains(message.Id))
-            .Any(x => x.ExtensionAttributes.ContainsKey("traceparent"));
+            .Any(x => x.ExtensionAttributes.ContainsKey("traceparent"))
+            .Any(x => x.Source == "jsdflkjsdf");
 
         using var subscriber = Configure.With(new EmptyActivator())
             .Transport(t => t.UseAzureServiceBus($"Endpoint={ConnectionString}", "jsdflkjsdf", new DefaultAzureCredential()))
-            .Options(o => o.UseCustomTypeNameForTopicName())
+            .Options(o => o
+                .UseCustomTypeNameForTopicName()
+                .UseSenderAddress("this-should-not-override-the-queue-name"))
             .Serialization(s => s
                 .UseCloudEvents()
                 .AddWithCustomName<UserLoggedIn>(Topic))
@@ -64,6 +67,35 @@ public class ToAzureServiceBus : IAsyncLifetime
         using var subscriber = Configure.With(new EmptyActivator())
             .Transport(t => t.UseAzureServiceBusAsOneWayClient($"Endpoint={ConnectionString}", new DefaultAzureCredential()))
             .Options(o => o.UseCustomTypeNameForTopicName())
+            .Serialization(s => s
+                .UseCloudEvents()
+                .AddWithCustomName<UserLoggedIn>(Topic))
+            .Logging(l => l.MicrosoftExtensionsLogging(_output.ToLoggerFactory()))
+            .Start();
+
+        // Act
+        await subscriber.Publish(message);
+        
+        // Assert
+        await Receive(ConnectionString, Topic, Subscription, hypothesis);
+    }
+    
+    [Fact]
+    public async Task OneWayUseSourceAddress()
+    {
+        // Arrange
+        var message = Message();
+        var hypothesis = Hypothesis
+            .For<CloudEvent>()
+            .Any(x => x.Source == "my-custom-source")
+            .Any(x => x.Data.ToString().Contains(message.Id));
+
+        using var subscriber = Configure.With(new EmptyActivator())
+            .Transport(t => t.UseAzureServiceBusAsOneWayClient($"Endpoint={ConnectionString}", new DefaultAzureCredential()))
+            .Options(o => o
+                .UseCustomTypeNameForTopicName()
+                .UseSenderAddress("my-custom-source"))
+            .Options(o => o.LogPipeline(true))
             .Serialization(s => s
                 .UseCloudEvents()
                 .AddWithCustomName<UserLoggedIn>(Topic))

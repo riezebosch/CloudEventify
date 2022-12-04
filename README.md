@@ -35,6 +35,20 @@ Configure.With(activator)
     .Start();
 ```
 
+Using custom source for one-way clients:
+
+```csharp
+Configure.With(activator)
+    .Transport(t => t.UseAzureServiceBusAsOneWayClient($"Endpoint={ConnectionString}", new DefaultAzureCredential()))
+    .Options(o => o
+        .UseSenderAddress("my-custom-source")
+        .UseCustomTypeNameForTopicName()
+        .InjectMessageId())
+    .Serialization(s => s.UseCloudEvents()
+        .AddWithCustomName<UserLoggedIn>("io.cloudevents.demo.user.loggedIn")) // <-- all types _must_ be mapped explicitly, either by short name or custom name
+    .Start();
+```
+
 ### MassTransit + RabbitMQ
 
 On bus level:
