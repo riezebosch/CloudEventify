@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Rebus.Config;
 using Rebus.Pipeline;
+using Rebus.Pipeline.Send;
 using Rebus.Serialization;
 using Rebus.Serialization.Custom;
 using Rebus.Topic;
@@ -39,6 +40,21 @@ public static class Factory
     public static OptionsConfigurer UseCustomTypeNameForTopicName(this OptionsConfigurer options)
     {
         options.Decorate<ITopicNameConvention>(c => new TopicNames(c.Get<IMessageTypeNameConvention>()));
+        return options;
+    }
+
+    /// <summary>
+    /// The sender-address is used for the source attribute on the cloud event. Since one-way clients do not have a source address, you can inject one here. 
+    /// </summary>
+    /// <remarks>
+    /// The rbs2-sender-address header (used to set the Source attribute) is only added when not already available.
+    /// </remarks>
+    public static OptionsConfigurer UseSenderAddress(this OptionsConfigurer options, string address)
+    {
+        options
+            .Decorate<IPipeline>(c => new PipelineStepInjector(c.Get<IPipeline>())
+            .OnSend(new Sender(address), PipelineRelativePosition.After, typeof(AssignDefaultHeadersStep)));
+
         return options;
     }
 }
