@@ -26,6 +26,9 @@ public static class Factory
     /// <summary>
     /// Injects a pseudo random message id for incoming messages not published by rebus. 
     /// </summary>
+    /// <remarks>
+    /// This is no longer required for the AzureServiceBus transport since v9.2.0+ 
+    /// </remarks>
     public static OptionsConfigurer InjectMessageId(this OptionsConfigurer options)
     {
         options

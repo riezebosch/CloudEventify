@@ -50,8 +50,8 @@ public class SerializerTests
         await app.StartAsync();
             
         var producer = Configure
-            .With(new BuiltinHandlerActivator())
-            .Transport(s => s.UseInMemoryTransport(network, "c"))
+            .OneWayClient()
+            .Transport(s => s.UseInMemoryTransportAsOneWayClient(network))
             .Subscriptions(s => s.StoreInMemory(subscribers))
             .Serialization(s => s.UseCloudEvents()
                 .AddWithCustomName<A.UserLoggedIn>("user.loggedIn"))

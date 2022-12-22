@@ -26,10 +26,11 @@ Configure.With(new EmptyActivator())
 
 ```csharp
 Configure.With(activator)
-    .Transport(t => t.UseAzureServiceBus($"Endpoint={ConnectionString}", queue, new DefaultAzureCredential()))
+    .Transport(t => t
+        .UseNativeHeaders()
+        .UseAzureServiceBus($"Endpoint={ConnectionString}", queue, new DefaultAzureCredential()))
     .Options(o => o
-        .UseCustomTypeNameForTopicName()
-        .InjectMessageId())
+        .UseCustomTypeNameForTopicName())
     .Serialization(s => s.UseCloudEvents()
         .AddWithCustomName<UserLoggedIn>("io.cloudevents.demo.user.loggedIn")) // <-- all types _must_ be mapped explicitly, either by short name or custom name
     .Start();
@@ -38,12 +39,13 @@ Configure.With(activator)
 Using custom source for one-way clients:
 
 ```csharp
-Configure.With(activator)
-    .Transport(t => t.UseAzureServiceBusAsOneWayClient($"Endpoint={ConnectionString}", new DefaultAzureCredential()))
+Configure.OneWayClient()
+    .Transport(t => t
+        .UseNativeHeaders()
+        .UseAzureServiceBusAsOneWayClient($"Endpoint={ConnectionString}", new DefaultAzureCredential()))
     .Options(o => o
         .UseSenderAddress("my-custom-source")
-        .UseCustomTypeNameForTopicName()
-        .InjectMessageId())
+        .UseCustomTypeNameForTopicName())
     .Serialization(s => s.UseCloudEvents()
         .AddWithCustomName<UserLoggedIn>("io.cloudevents.demo.user.loggedIn")) // <-- all types _must_ be mapped explicitly, either by short name or custom name
     .Start();

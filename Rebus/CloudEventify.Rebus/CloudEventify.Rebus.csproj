@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Rebus" Version="6.6.5" />
+      <PackageReference Include="Rebus" Version="[6.6.5,7)" />
     </ItemGroup>
 
     <ItemGroup>
@@ -20,7 +20,7 @@
         <NeutralLanguage>en-US</NeutralLanguage>
         <PackageId>CloudEventify.Rebus</PackageId>
         <Description>Use cloud events for pub/sub with Rebus.</Description>
-        <PackageReleaseNotes>BREAKING CHANGE: using custom type name for topic names no longer replaces `.` with `/`.</PackageReleaseNotes>
+        <PackageReleaseNotes>Support Rebus v7+</PackageReleaseNotes>
         <PackageTags>cloudevents;cloud;events;rebus</PackageTags>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <PackageReadmeFile>README.md</PackageReadmeFile>

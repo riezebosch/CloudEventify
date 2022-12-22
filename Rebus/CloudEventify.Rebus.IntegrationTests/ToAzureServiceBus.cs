@@ -6,6 +6,7 @@ using Azure.Messaging.ServiceBus.Administration;
 using Bogus;
 using FluentAssertions.Extensions;
 using Hypothesist;
+using Rebus.Activation;
 using Rebus.Config;
 using Xunit;
 using Xunit.Abstractions;
@@ -37,7 +38,8 @@ public class ToAzureServiceBus : IAsyncLifetime
             .Any(x => x.ExtensionAttributes.ContainsKey("traceparent"))
             .Any(x => x.Source == "jsdflkjsdf");
 
-        using var subscriber = Configure.With(new EmptyActivator())
+        using var activator = new BuiltinHandlerActivator(); // not used, but testing the queue's address on the cloud event
+        using var subscriber = Configure.With(activator)
             .Transport(t => t.UseAzureServiceBus($"Endpoint={ConnectionString}", "jsdflkjsdf", new DefaultAzureCredential()))
             .Options(o => o
                 .UseCustomTypeNameForTopicName()
@@ -65,8 +67,10 @@ public class ToAzureServiceBus : IAsyncLifetime
             .Any(x => x.Source == "cloudeventify:rebus")
             .Any(x => x.Data.ToString().Contains(message.Id));
 
-        using var subscriber = Configure.With(new EmptyActivator())
-            .Transport(t => t.UseAzureServiceBusAsOneWayClient($"Endpoint={ConnectionString}", new DefaultAzureCredential()))
+        using var subscriber = Configure.OneWayClient()
+            .Transport(t => t
+                .UseNativeHeaders()
+                .UseAzureServiceBusAsOneWayClient($"Endpoint={ConnectionString}", new DefaultAzureCredential()))
             .Options(o => o.UseCustomTypeNameForTopicName())
             .Serialization(s => s
                 .UseCloudEvents()
@@ -91,8 +95,10 @@ public class ToAzureServiceBus : IAsyncLifetime
             .Any(x => x.Source == "my-custom-source")
             .Any(x => x.Data.ToString().Contains(message.Id));
 
-        using var subscriber = Configure.With(new EmptyActivator())
-            .Transport(t => t.UseAzureServiceBusAsOneWayClient($"Endpoint={ConnectionString}", new DefaultAzureCredential()))
+        using var subscriber = Configure.OneWayClient()
+            .Transport(t => t
+                .UseNativeHeaders()
+                .UseAzureServiceBusAsOneWayClient($"Endpoint={ConnectionString}", new DefaultAzureCredential()))
             .Options(o => o
                 .UseCustomTypeNameForTopicName()
                 .UseSenderAddress("my-custom-source"))

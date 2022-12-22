@@ -45,9 +45,9 @@ public class FromAzureServiceBus
         using var subscriber = Configure.With(activator)
             .Transport(t => t.UseAzureServiceBus($"Endpoint={ConnectionString}", queue, new DefaultAzureCredential()))
             .Options(o => o
-                .UseCustomTypeNameForTopicName()
-                .InjectMessageId())
-            .Serialization(s => s.UseCloudEvents()
+                .UseCustomTypeNameForTopicName())
+            .Serialization(s => s
+                .UseCloudEvents()
                 .AddWithCustomName<UserLoggedIn>(Topic))
             .Logging(l => l.MicrosoftExtensionsLogging(_output.ToLoggerFactory()))
             .Start();
