@@ -142,13 +142,18 @@ public class ToAzureServiceBus : IAsyncLifetime
     async Task IAsyncLifetime.InitializeAsync()
     {
         var admin = new ServiceBusAdministrationClient(ConnectionString, new DefaultAzureCredential());
-        if (await admin.SubscriptionExistsAsync(Topic, Subscription))
+        if (await admin.TopicExistsAsync(Topic))
         {
-            await admin.DeleteSubscriptionAsync(Topic, Subscription);
+            await admin.DeleteTopicAsync(Topic);
         }
 
+        await admin.CreateTopicAsync(Topic);
         await admin.CreateSubscriptionAsync(Topic, Subscription);
     }
 
-    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
+    async Task IAsyncLifetime.DisposeAsync()
+    {
+        var admin = new ServiceBusAdministrationClient(ConnectionString, new DefaultAzureCredential());
+        await admin.DeleteTopicAsync(Topic);
+    }
 }
