@@ -51,7 +51,7 @@ public class ToDapr : IClassFixture<RabbitMqContainer>
     {
         var sidecar = new Sidecar("to-dapr", logger.ToLogger<Sidecar>());
         await sidecar.Start(with => with
-            .ComponentsPath("components")
+            .ResourcesPath("components")
             .AppPort(6000));
 
         return sidecar;

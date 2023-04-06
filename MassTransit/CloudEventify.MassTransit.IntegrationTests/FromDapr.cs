@@ -94,7 +94,7 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
     {
         await using var sidecar = new Sidecar("from-dapr", logger.ToLogger<Sidecar>());
         await sidecar.Start(with => with
-            .ComponentsPath("components")
+            .ResourcesPath("components")
             .DaprGrpcPort(3001));
 
         using var client = new DaprClientBuilder()

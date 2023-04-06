@@ -38,8 +38,9 @@ public class UserControllerTests
     {
         var sidecar = new Sidecar("test-dapr", logger.ToLogger<Sidecar>());
         await sidecar.Start(with => with
-            .ComponentsPath("components")
-            .DaprGrpcPort(3002)
+            .ResourcesPath("components")
+            .DaprGrpcPort(4001)
+            .DaprHttpPort(4002)
             .AppPort(6002));
 
         return sidecar;
@@ -77,9 +78,11 @@ public class UserControllerTests
     private static async Task Publish()
     {
         using var client = new DaprClientBuilder()
-            .UseGrpcEndpoint("http://localhost:3002")
+            .UseGrpcEndpoint("http://localhost:4001")
+            .UseHttpEndpoint("http://localhost:4002")
             .Build();
 
+        await client.WaitForSidecarAsync();
         await client
             .PublishEventAsync("my-pubsub", "user/loggedIn",  new CloudEvent<Data>(new Data(1234)) { Type = "loggedIn"});
     }

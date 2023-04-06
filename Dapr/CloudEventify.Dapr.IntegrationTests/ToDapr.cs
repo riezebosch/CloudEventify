@@ -16,9 +16,6 @@ namespace CloudEventify.Dapr.IntegrationTests;
 public class ToDapr
 {
     private readonly ITestOutputHelper _output;
-    private const int AppPort = 6000;
-    private const int DaprGrpcPort = 3001;
-    private const string DaprHttpPort = "3002";
 
     public ToDapr(ITestOutputHelper output) => 
         _output = output;
@@ -32,21 +29,21 @@ public class ToDapr
             .For<int>()
             .Any(x => x == message.UserId);
 
-        await using var host = await Host(hypothesis.ToHandler());
-        await using var sidecar = await Sidecar(_output);
+        await using var host = await Host(hypothesis.ToHandler(), 6000);
+        await using var sidecar = await Sidecar(6000, 3001, 3000, _output);
             
         // Act
-        await Publish(message);
+        await Publish(message, 3001, 3000);
 
         // Assert
         await hypothesis.Validate(30.Seconds());
     }
 
-    private static async Task Publish(UserLoggedIn message)
+    private static async Task Publish(UserLoggedIn message, int grpc, int http)
     {
         using var client = new DaprClientBuilder()
-            .UseGrpcEndpoint($"http://127.0.0.1:{DaprGrpcPort}")
-            .UseHttpEndpoint($"http://127.0.0.1:{DaprHttpPort}")
+            .UseGrpcEndpoint($"http://127.0.0.1:{grpc}")
+            .UseHttpEndpoint($"http://127.0.0.1:{http}")
             .UseCloudEvents()
             .WithTypes(types => types.Map<UserLoggedIn>("loggedIn"))
             .Build();
@@ -55,20 +52,19 @@ public class ToDapr
         await client.PublishEventAsync("my-pubsub", "user/loggedIn", message);
     }
 
-
-    private async Task<Sidecar> Sidecar(ITestOutputHelper logger)
+    private static async Task<Sidecar> Sidecar(int app, int grpc, int http, ITestOutputHelper output)
     {
-        var sidecar = new Sidecar("to-dapr", logger.ToLogger<Sidecar>());
+        var sidecar = new Sidecar("to-dapr", output.ToLogger<Sidecar>());
         await sidecar.Start(with => with
-            .ComponentsPath("components")
-            .AppPort(AppPort)
-            .Args("-H", DaprHttpPort)
-            .DaprGrpcPort(DaprGrpcPort));
+            .ResourcesPath("components")
+            .AppPort(app)
+            .DaprHttpPort(http)
+            .DaprGrpcPort(grpc));
 
         return sidecar;
     }
 
-    private async Task<IAsyncDisposable> Host(IHandler<int> handler)
+    private async Task<IAsyncDisposable> Host(IHandler<int> handler, int port)
     {
         var app = Startup.App(builder =>
         {
@@ -76,7 +72,7 @@ public class ToDapr
             builder.Logging.AddXUnit(_output);
         });
 
-        app.Urls.Add($"http://localhost:{AppPort}");
+        app.Urls.Add($"http://localhost:{port}");
         await app.StartAsync();
         
         return app;
