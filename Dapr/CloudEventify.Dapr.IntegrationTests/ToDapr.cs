@@ -16,6 +16,9 @@ namespace CloudEventify.Dapr.IntegrationTests;
 public class ToDapr
 {
     private readonly ITestOutputHelper _output;
+    private const int AppPort = 6000;
+    private const int DaprGrpcPort = 3001;
+    private const string DaprHttpPort = "3002";
 
     public ToDapr(ITestOutputHelper output) => 
         _output = output;
@@ -42,22 +45,25 @@ public class ToDapr
     private static async Task Publish(UserLoggedIn message)
     {
         using var client = new DaprClientBuilder()
-            .UseGrpcEndpoint("http://localhost:3001")
+            .UseGrpcEndpoint($"http://127.0.0.1:{DaprGrpcPort}")
+            .UseHttpEndpoint($"http://127.0.0.1:{DaprHttpPort}")
             .UseCloudEvents()
             .WithTypes(types => types.Map<UserLoggedIn>("loggedIn"))
             .Build();
-
+        
+        await client.WaitForSidecarAsync();
         await client.PublishEventAsync("my-pubsub", "user/loggedIn", message);
     }
 
 
-    private static async Task<Sidecar> Sidecar(ITestOutputHelper logger)
+    private async Task<Sidecar> Sidecar(ITestOutputHelper logger)
     {
         var sidecar = new Sidecar("to-dapr", logger.ToLogger<Sidecar>());
         await sidecar.Start(with => with
             .ComponentsPath("components")
-            .AppPort(6000)
-            .DaprGrpcPort(3001));
+            .AppPort(AppPort)
+            .Args("-H", DaprHttpPort)
+            .DaprGrpcPort(DaprGrpcPort));
 
         return sidecar;
     }
@@ -69,8 +75,8 @@ public class ToDapr
             builder.Services.AddSingleton(handler);
             builder.Logging.AddXUnit(_output);
         });
-        
-        app.Urls.Add("http://localhost:6000");
+
+        app.Urls.Add($"http://localhost:{AppPort}");
         await app.StartAsync();
         
         return app;

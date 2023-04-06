@@ -14,12 +14,10 @@ internal sealed class Client : DaprClient
         _wrap = wrap;
     }
     
-    public override Task PublishEventAsync<TData>(string pubsubName, string topicName, TData data,
-        CancellationToken cancellationToken = new()) =>
+    public override Task PublishEventAsync<TData>(string pubsubName, string topicName, TData data, CancellationToken cancellationToken = new()) =>
         _client.PublishEventAsync(pubsubName, topicName, _wrap.Envelope(data), cancellationToken);
 
-    public override Task PublishEventAsync<TData>(string pubsubName, string topicName, TData data, Dictionary<string, string> metadata,
-        CancellationToken cancellationToken = new()) =>
+    public override Task PublishEventAsync<TData>(string pubsubName, string topicName, TData data, Dictionary<string, string> metadata, CancellationToken cancellationToken = new()) =>
         _client.PublishEventAsync(pubsubName, topicName, _wrap.Envelope(data), metadata, cancellationToken);
 
     public override Task PublishEventAsync(string pubsubName, string topicName, CancellationToken cancellationToken = new()) =>
@@ -27,6 +25,12 @@ internal sealed class Client : DaprClient
 
     public override Task PublishEventAsync(string pubsubName, string topicName, Dictionary<string, string> metadata, CancellationToken cancellationToken = new()) =>
         _client.PublishEventAsync(pubsubName, topicName, metadata, cancellationToken);
+
+    public override Task<BulkPublishResponse<TValue>> BulkPublishEventAsync<TValue>(string pubsubName, string topicName, IReadOnlyList<TValue> events, Dictionary<string, string>? metadata = null, CancellationToken cancellationToken = new()) =>
+        _client.BulkPublishEventAsync(pubsubName, topicName, events, metadata, cancellationToken);
+
+    public override Task PublishByteEventAsync(string pubsubName, string topicName, ReadOnlyMemory<byte> data, string dataContentType = "application/json", Dictionary<string, string>? metadata = null, CancellationToken cancellationToken = new()) =>
+        _client.PublishByteEventAsync(pubsubName, topicName, data, dataContentType, metadata, cancellationToken);
 
     public override Task InvokeBindingAsync<TRequest>(string bindingName, string operation, TRequest data, IReadOnlyDictionary<string, string> metadata = null, CancellationToken cancellationToken = new()) =>
         _client.InvokeBindingAsync(bindingName, operation, _wrap.Envelope(data), metadata, cancellationToken);
@@ -51,6 +55,15 @@ internal sealed class Client : DaprClient
 
     public override Task WaitForSidecarAsync(CancellationToken cancellationToken = new()) => 
         _client.WaitForSidecarAsync(cancellationToken);
+
+    public override Task ShutdownSidecarAsync(CancellationToken cancellationToken = new()) =>
+        _client.ShutdownSidecarAsync(cancellationToken);
+
+    public override Task<DaprMetadata> GetMetadataAsync(CancellationToken cancellationToken = new()) =>
+        _client.GetMetadataAsync(cancellationToken);
+
+    public override Task SetMetadataAsync(string attributeName, string attributeValue, CancellationToken cancellationToken = new()) =>
+        Task.FromResult(_client.SetMetadataAsync(attributeName, attributeValue, cancellationToken));
 
     public override Task<HttpResponseMessage> InvokeMethodWithResponseAsync(HttpRequestMessage request, CancellationToken cancellationToken = new()) =>
         _client.InvokeMethodWithResponseAsync(request, cancellationToken);
@@ -78,6 +91,9 @@ internal sealed class Client : DaprClient
 
     public override Task<IReadOnlyList<BulkStateItem>> GetBulkStateAsync(string storeName, IReadOnlyList<string> keys, int? parallelism, IReadOnlyDictionary<string, string> metadata = null, CancellationToken cancellationToken = new()) =>
         _client.GetBulkStateAsync(storeName, keys, parallelism, metadata, cancellationToken);
+
+    public override Task SaveBulkStateAsync<TValue>(string storeName, IReadOnlyList<SaveStateItem<TValue>> items, CancellationToken cancellationToken = new()) =>
+        Task.FromResult(_client.SaveBulkStateAsync(storeName, items, cancellationToken));
 
     public override Task DeleteBulkStateAsync(string storeName, IReadOnlyList<BulkDeleteStateItem> items, CancellationToken cancellationToken = new()) =>
         _client.DeleteBulkStateAsync(storeName, items, cancellationToken);
@@ -109,20 +125,37 @@ internal sealed class Client : DaprClient
     public override Task<Dictionary<string, Dictionary<string, string>>> GetBulkSecretAsync(string storeName, IReadOnlyDictionary<string, string> metadata = null, CancellationToken cancellationToken = new()) =>
         _client.GetBulkSecretAsync(storeName, metadata, cancellationToken);
 
+    [Obsolete("Obsolete")]
     public override Task<GetConfigurationResponse> GetConfiguration(string storeName, IReadOnlyList<string> keys, IReadOnlyDictionary<string, string> metadata = null, CancellationToken cancellationToken = new()) =>
         _client.GetConfiguration(storeName, keys, metadata, cancellationToken);
 
+    [Obsolete("Obsolete")]
     public override Task<SubscribeConfigurationResponse> SubscribeConfiguration(string storeName, IReadOnlyList<string> keys, IReadOnlyDictionary<string, string> metadata = null, CancellationToken cancellationToken = new()) =>
         _client.SubscribeConfiguration(storeName, keys, metadata, cancellationToken);
 
+    [Obsolete("Obsolete")]
     public override Task<UnsubscribeConfigurationResponse> UnsubscribeConfiguration(string storeName, string id, CancellationToken cancellationToken = new()) =>
         _client.UnsubscribeConfiguration(storeName, id, cancellationToken);
 
+    [Obsolete("Obsolete")]
     public override Task<TryLockResponse> Lock(string storeName, string resourceId, string lockOwner, int expiryInSeconds, CancellationToken cancellationToken = new()) =>
         _client.Lock(storeName, resourceId, lockOwner, expiryInSeconds, cancellationToken);
 
+    [Obsolete("Obsolete")]
     public override Task<UnlockResponse> Unlock(string storeName, string resourceId, string lockOwner, CancellationToken cancellationToken = new()) =>
         _client.Unlock(storeName, resourceId, lockOwner, cancellationToken);
+
+    [Obsolete("This API is currently not stable as it is in the Alpha stage. This attribute will be removed once it is stable.")]
+    public override Task<WorkflowReference> StartWorkflowAsync(string instanceId, string workflowComponent, string workflowName, object input, IReadOnlyDictionary<string, string>? workflowOptions = null, CancellationToken cancellationToken = new()) =>
+        _client.StartWorkflowAsync(instanceId, workflowComponent, workflowName, input, workflowOptions, cancellationToken);
+
+    [Obsolete("This API is currently not stable as it is in the Alpha stage. This attribute will be removed once it is stable.")]
+    public override Task<GetWorkflowResponse> GetWorkflowAsync(string instanceId, string workflowComponent, string workflowName, CancellationToken cancellationToken = new()) =>
+        _client.GetWorkflowAsync(instanceId, workflowComponent, workflowName, cancellationToken);
+
+    [Obsolete("This API is currently not stable as it is in the Alpha stage. This attribute will be removed once it is stable.")]
+    public override Task TerminateWorkflowAsync(string instanceId, string workflowComponent, CancellationToken cancellationToken = new()) =>
+        _client.TerminateWorkflowAsync(instanceId, workflowComponent, cancellationToken);
 
     public override JsonSerializerOptions JsonSerializerOptions => 
         _client.JsonSerializerOptions;
