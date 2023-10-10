@@ -1,6 +1,6 @@
 namespace CloudEventify;
 
-public class Mapper : IMap
+public class Mapper : IMap, ITryMap
 {
     private readonly Dictionary<string, Type> _from = new();
     private readonly Dictionary<Type, Map> _to = new();
@@ -23,5 +23,8 @@ public class Mapper : IMap
     }
     
     public Type this[string type] => _from[type];
-    public Map this[Type type] => _to[type];
+    public bool TryGet(string from, out Type? to) => _from.TryGetValue(from, out to);
+
+    public Map this[Type type] =>  _to[type];
+    public bool TryGet(Type from, out Map? to) => _to.TryGetValue(from, out to);
 }
