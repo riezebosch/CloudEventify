@@ -41,6 +41,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NServiceBus", "NServiceBus"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventify.NServiceBus", "NServiceBus\CloudEventify.NServiceBus\CloudEventify.NServiceBus.csproj", "{C41E07DE-F773-444B-AD8D-4512E7907DFF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEventify.NServiceBus.Tests", "NServiceBus\CloudEventify.NServiceBus.Tests\CloudEventify.NServiceBus.Tests.csproj", "{114CA70A-72B0-401E-9B5D-A5888AD445C7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -99,6 +101,10 @@ Global
 		{C41E07DE-F773-444B-AD8D-4512E7907DFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C41E07DE-F773-444B-AD8D-4512E7907DFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C41E07DE-F773-444B-AD8D-4512E7907DFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{114CA70A-72B0-401E-9B5D-A5888AD445C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{114CA70A-72B0-401E-9B5D-A5888AD445C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{114CA70A-72B0-401E-9B5D-A5888AD445C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{114CA70A-72B0-401E-9B5D-A5888AD445C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D2D6EA38-194F-4DC3-BF99-7E8ADEF8A48D} = {F4CDDE17-BD5E-4495-94E0-44592CCB015B}
@@ -110,5 +116,6 @@ Global
 		{E10D5F56-4F70-4B10-A116-A11B342D42CF} = {6E3F98B2-0CDF-48BC-BAD2-682159E631D7}
 		{2B00DCB8-9483-4597-9B24-5BE338A1D873} = {6E3F98B2-0CDF-48BC-BAD2-682159E631D7}
 		{C41E07DE-F773-444B-AD8D-4512E7907DFF} = {4D6DF8D7-6388-41C2-ADBB-80785E45D0E2}
+		{114CA70A-72B0-401E-9B5D-A5888AD445C7} = {4D6DF8D7-6388-41C2-ADBB-80785E45D0E2}
 	EndGlobalSection
 EndGlobal
