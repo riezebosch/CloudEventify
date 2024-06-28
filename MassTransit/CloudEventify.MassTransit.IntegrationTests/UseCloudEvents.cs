@@ -25,9 +25,8 @@ public class UseCloudEvents : IClassFixture<RabbitMqContainer>
     {
         // Arrange
         var message = new Faker<Request>().CustomInstantiator(f => new Request(f.Random.Number())).Generate();
-        var hypothesis = Hypothesis
-            .For<Reply>()
-            .Any(x => x.Id == message.UserId);
+        var observer = Observer
+            .For<Reply>();
 
         LogContext.ConfigureCurrentLogContext(_output.ToLoggerFactory());
         var bus = Bus.Factory
@@ -44,7 +43,7 @@ public class UseCloudEvents : IClassFixture<RabbitMqContainer>
                     
                 cfg.ReceiveEndpoint("user:loggedIn:test", e =>
                 {
-                    e.Handler<Reply>(x => hypothesis.Test(x.Message));
+                    e.Handler<Reply>(x => observer.Add(x.Message));
                     e.Bind("user/loggedIn");
                 });
             });
@@ -57,7 +56,12 @@ public class UseCloudEvents : IClassFixture<RabbitMqContainer>
         await endpoint.Send(message);
 
         // Assert
-        await hypothesis.Validate(30.Seconds());
+        await Hypothesis
+            .On(observer)
+            .Timebox(30.Seconds())
+            .Any()
+            .Match(x => x.Id == message.UserId)
+            .Validate();
     }
     
     public record Request(int UserId);

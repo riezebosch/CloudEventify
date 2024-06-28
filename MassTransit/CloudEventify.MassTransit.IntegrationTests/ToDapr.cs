@@ -31,18 +31,22 @@ public class ToDapr : IClassFixture<RabbitMqContainer>
     {
         // Arrange
         var message = new Faker<UserLoggedIn>().CustomInstantiator(f => new UserLoggedIn(f.Random.Number())).Generate();
-        var hypothesis = Hypothesis
-            .For<int>()
-            .Any(x => x == message.UserId);
+        var observer = Observer
+            .For<int>();
 
-        await using var host = await Host(hypothesis.ToHandler(), 6123);
+        await using var host = await Host(observer.ToHandler(), 6123);
         await using var sidecar = await Sidecar(_output, 6123);
             
         // Act
         await Publish(message, _output);
 
         // Assert
-        await hypothesis.Validate(30.Seconds());
+        await Hypothesis
+            .On(observer)
+            .Timebox(30.Seconds())
+            .Any()
+            .Match(x => x == message.UserId)
+            .Validate();
     }
         
         

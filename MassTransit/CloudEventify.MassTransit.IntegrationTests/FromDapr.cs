@@ -28,9 +28,8 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
     {
         // Arrange
         var message = Message();
-        var hypothesis = Hypothesis
-            .For<UserLoggedIn>()
-            .Any(x => x == message);
+        var observer = Observer
+            .For<UserLoggedIn>();
 
         LogContext.ConfigureCurrentLogContext(_output.ToLoggerFactory());
             
@@ -43,7 +42,7 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
                     
                 cfg.ReceiveEndpoint("user:loggedIn:test", e =>
                 {
-                    e.Handler<UserLoggedIn>(x => hypothesis.Test(x.Message));
+                    e.Handler<UserLoggedIn>(x => observer.Add(x.Message));
                     e.Bind("user/loggedIn");
                 });
             });
@@ -54,7 +53,12 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
         await Publish(message, _output);
 
         // Assert
-        await hypothesis.Validate(15.Seconds());
+        await Hypothesis
+            .On(observer)
+            .Timebox(15.Seconds())
+            .Any()
+            .Match(x => x == message)
+            .Validate();
     }
 
     [Fact]
@@ -62,9 +66,7 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
     {
         // Arrange
         var message = Message();
-        var hypothesis = Hypothesis
-            .For<UserLoggedIn>()
-            .Any(x => x == message);
+        var hypothesis = Observer.For<UserLoggedIn>();
 
         LogContext.ConfigureCurrentLogContext(_output.ToLoggerFactory());
             
@@ -76,7 +78,7 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
                 {
                     x.UseCloudEvents()
                         .WithTypes(types => types.Map<UserLoggedIn>("user.loggedIn"));
-                    x.Handler<UserLoggedIn>(m => hypothesis.Test(m.Message));
+                    x.Handler<UserLoggedIn>(m => hypothesis.Add(m.Message));
                     x.Bind("user/loggedIn");
                 });
             });
@@ -86,7 +88,12 @@ public class FromDapr : IClassFixture<RabbitMqContainer>
         await Publish(message, _output);
 
         // Assert
-        await hypothesis.Validate(30.Seconds());
+        await Hypothesis
+            .On(hypothesis)
+            .Timebox(30.Seconds())
+            .Any()
+            .Match(x => x == message)
+            .Validate();
     }
 
 
