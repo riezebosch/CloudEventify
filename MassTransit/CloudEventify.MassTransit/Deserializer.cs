@@ -47,29 +47,29 @@ public class Deserializer : IMessageDeserializer
 
         Guid? MessageContext.MessageId => Guid.TryParse(_cloudEvent.Id, out var id) ? id : null;
 
-        Guid? MessageContext.RequestId { get; }
+        Guid? MessageContext.RequestId => null;
 
-        Guid? MessageContext.CorrelationId { get; }
+        Guid? MessageContext.CorrelationId => null;
 
-        Guid? MessageContext.ConversationId { get; }
+        Guid? MessageContext.ConversationId => null;
 
-        Guid? MessageContext.InitiatorId { get; }
+        Guid? MessageContext.InitiatorId => null;
 
-        DateTime? MessageContext.ExpirationTime { get; }
+        DateTime? MessageContext.ExpirationTime => null;
 
         Uri? MessageContext.SourceAddress => _cloudEvent.Source;
 
-        Uri? MessageContext.DestinationAddress { get; }
+        Uri? MessageContext.DestinationAddress => null;
 
-        Uri? MessageContext.ResponseAddress { get; }
+        Uri? MessageContext.ResponseAddress => null;
 
-        Uri? MessageContext.FaultAddress { get; }
+        Uri? MessageContext.FaultAddress => null;
 
         DateTime? MessageContext.SentTime => _cloudEvent.Time?.DateTime;
 
         Headers MessageContext.Headers => EmptyHeaders.Instance;
 
-        HostInfo MessageContext.Host { get; }
+        HostInfo MessageContext.Host => null!;
 
         T IObjectDeserializer.DeserializeObject<T>(object? value, T? defaultValue) where T : class => 
             throw new NotImplementedException();
@@ -100,7 +100,7 @@ public class Deserializer : IMessageDeserializer
             }
         }
 
-        bool SerializerContext.TryGetMessage(Type messageType, out object? message) => 
+        bool SerializerContext.TryGetMessage(Type messageType, out object message) => 
             throw new NotImplementedException();
 
         IMessageSerializer SerializerContext.GetMessageSerializer() =>
@@ -115,31 +115,25 @@ public class Deserializer : IMessageDeserializer
         Dictionary<string, object> SerializerContext.ToDictionary<T>(T? message) where T : class => 
             throw new NotImplementedException();
 
-        string[] SerializerContext.SupportedMessageTypes { get; } = Array.Empty<string>();
+        string[] SerializerContext.SupportedMessageTypes => [];
     }
 
     MessageBody IMessageDeserializer.GetMessageBody(string text) =>
         new StringMessageBody(text);
 
-    public ContentType ContentType
-    {
-        get;
-    }
+    public ContentType ContentType { get; }
 
-    private class CloudEventContext : DeserializerConsumeContext
+    private class CloudEventContext(ReceiveContext receiveContext, SerializerContext serializerContext)
+        : DeserializerConsumeContext(receiveContext, serializerContext)
     {
-        public CloudEventContext(ReceiveContext receiveContext, SerializerContext serializerContext) : base(receiveContext, serializerContext)
-        {
-        }
-
         public override bool HasMessageType(Type messageType) =>
             true;
 
-        public override bool TryGetMessage<T>(out ConsumeContext<T>? consumeContext)
+        public override bool TryGetMessage<T>(out ConsumeContext<T> consumeContext)
         {
             if (!SerializerContext.TryGetMessage<T>(out var message))
             {
-                consumeContext = null;
+                consumeContext = null!;
                 return false;
             }
 
@@ -153,10 +147,10 @@ public class Deserializer : IMessageDeserializer
         public override Guid? ConversationId => SerializerContext.ConversationId;
         public override Guid? InitiatorId => SerializerContext.InitiatorId;
         public override DateTime? ExpirationTime => SerializerContext.ExpirationTime;
-        public override Uri? SourceAddress => SerializerContext.SourceAddress;
-        public override Uri? DestinationAddress => SerializerContext.DestinationAddress;
-        public override Uri? ResponseAddress => SerializerContext.ResponseAddress;
-        public override Uri? FaultAddress => SerializerContext.FaultAddress;
+        public override Uri SourceAddress => SerializerContext.SourceAddress!;
+        public override Uri DestinationAddress => SerializerContext.DestinationAddress!;
+        public override Uri ResponseAddress => SerializerContext.ResponseAddress!;
+        public override Uri FaultAddress => SerializerContext.FaultAddress!;
         public override DateTime? SentTime => SerializerContext.SentTime;
         public override Headers Headers => SerializerContext.Headers;
         public override HostInfo Host => SerializerContext.Host;

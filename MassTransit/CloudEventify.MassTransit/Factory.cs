@@ -8,7 +8,7 @@ public static class Factory
     {
         var builder = new Builder();
         cfg.AddDeserializer(builder, true);
-        cfg.AddSerializer(builder, true);
+        cfg.AddSerializer(builder);
 
         return builder;
     }
@@ -17,7 +17,7 @@ public static class Factory
     {
         var builder = new Builder();
         cfg.AddDeserializer(builder, true);
-        cfg.AddSerializer(builder, true);
+        cfg.AddSerializer(builder);
 
         return builder;
     }
