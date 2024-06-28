@@ -1,4 +1,4 @@
-version: 2.1.{build}
+version: 2.2.{build}
 branches:
   only:
     - main
@@ -24,7 +24,7 @@ build:
   verbosity: minimal
 before_test:
   - docker login -u mriezebosch -p $DOCKER_TOKEN
-  - az login --service-principal --tenant 2654a8a0-11c9-4a1f-8d0a-1125f5e81496 -u d8c7ff4d-558a-425b-87fc-debc292ae362 -p $SPN_TOKEN
+  - az login --service-principal --tenant 3d4d17ea-1ae4-4705-947e-51369c5a5f79 -u 747fff68-4cd5-4750-9434-af423bccf25e -p $SPN_TOKEN
   - sudo wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O - | /bin/bash
   - dapr init --slim
 after_test:
@@ -39,7 +39,7 @@ environment:
   DOCKER_TOKEN:
     secure: Dj3j/X71ZSCnXP24pR/1fmGLBKUYFOeN7R9s+QioevmuSGjGzAGq19hIws1w4Csa
   SPN_TOKEN:
-    secure: Sag3dVLEaqxdGQAFyq1jQKy3oOwFLg2TgTJQxsHaagFV6qS33FAbYC5uB8LX5O4K
+    secure: 5ruBbdXx8Yvg7mdIYuu6ol5xNTkBrC4oYB8+hbdaDC8spcp0sshzkzAozIq62NMk
 for:
   - branches:
       only:
