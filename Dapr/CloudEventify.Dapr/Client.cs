@@ -92,6 +92,10 @@ internal sealed class Client : DaprClient
     public override Task<IReadOnlyList<BulkStateItem>> GetBulkStateAsync(string storeName, IReadOnlyList<string> keys, int? parallelism, IReadOnlyDictionary<string, string> metadata = null, CancellationToken cancellationToken = new()) =>
         _client.GetBulkStateAsync(storeName, keys, parallelism, metadata, cancellationToken);
 
+    public override async Task<IReadOnlyList<BulkStateItem<TValue>>> GetBulkStateAsync<TValue>(string storeName, IReadOnlyList<string> keys, int? parallelism,
+        IReadOnlyDictionary<string, string> metadata = null, CancellationToken cancellationToken = new CancellationToken()) =>
+        await _client.GetBulkStateAsync<TValue>(storeName, keys, parallelism, metadata, cancellationToken);
+
     public override Task SaveBulkStateAsync<TValue>(string storeName, IReadOnlyList<SaveStateItem<TValue>> items, CancellationToken cancellationToken = new()) =>
         Task.FromResult(_client.SaveBulkStateAsync(storeName, items, cancellationToken));
 
@@ -137,6 +141,37 @@ internal sealed class Client : DaprClient
     public override Task<UnsubscribeConfigurationResponse> UnsubscribeConfiguration(string storeName, string id, CancellationToken cancellationToken = new()) =>
         _client.UnsubscribeConfiguration(storeName, id, cancellationToken);
 
+    public override async Task<ReadOnlyMemory<byte>> EncryptAsync(string vaultResourceName, ReadOnlyMemory<byte> plaintextBytes, string keyName,
+        EncryptionOptions encryptionOptions, CancellationToken cancellationToken = new CancellationToken())
+    {
+        return await _client.EncryptAsync(vaultResourceName, plaintextBytes, keyName, encryptionOptions, cancellationToken);
+    }
+
+    [Obsolete("Obsolete")]
+    public override async Task<IAsyncEnumerable<ReadOnlyMemory<byte>>> EncryptAsync(string vaultResourceName, Stream plaintextStream, string keyName, EncryptionOptions encryptionOptions,
+        CancellationToken cancellationToken = new CancellationToken()) =>
+        await _client.EncryptAsync(vaultResourceName, plaintextStream, keyName, encryptionOptions, cancellationToken);
+
+    [Obsolete("Obsolete")]
+    public override async Task<ReadOnlyMemory<byte>> DecryptAsync(string vaultResourceName, ReadOnlyMemory<byte> ciphertextBytes, string keyName, DecryptionOptions options,
+        CancellationToken cancellationToken = new CancellationToken()) =>
+        await _client.DecryptAsync(vaultResourceName, ciphertextBytes, keyName, options, cancellationToken);
+
+    [Obsolete("Obsolete")]
+    public override async Task<ReadOnlyMemory<byte>> DecryptAsync(string vaultResourceName, ReadOnlyMemory<byte> ciphertextBytes, string keyName,
+        CancellationToken cancellationToken = new CancellationToken()) =>
+        await _client.DecryptAsync(vaultResourceName, ciphertextBytes, keyName, cancellationToken);
+
+    [Obsolete("Obsolete")]
+    public override async Task<IAsyncEnumerable<ReadOnlyMemory<byte>>> DecryptAsync(string vaultResourceName, Stream ciphertextStream, string keyName, DecryptionOptions options,
+        CancellationToken cancellationToken = new CancellationToken()) =>
+        await _client.DecryptAsync(vaultResourceName, ciphertextStream, keyName, options, cancellationToken);
+
+    [Obsolete("Obsolete")]
+    public override async Task<IAsyncEnumerable<ReadOnlyMemory<byte>>> DecryptAsync(string vaultResourceName, Stream ciphertextStream, string keyName,
+        CancellationToken cancellationToken = new CancellationToken()) =>
+        await _client.DecryptAsync(vaultResourceName, ciphertextStream, keyName, cancellationToken);
+
     [Obsolete("Obsolete")]
     public override Task<TryLockResponse> Lock(string storeName, string resourceId, string lockOwner, int expiryInSeconds, CancellationToken cancellationToken = new()) =>
         _client.Lock(storeName, resourceId, lockOwner, expiryInSeconds, cancellationToken);
@@ -145,17 +180,38 @@ internal sealed class Client : DaprClient
     public override Task<UnlockResponse> Unlock(string storeName, string resourceId, string lockOwner, CancellationToken cancellationToken = new()) =>
         _client.Unlock(storeName, resourceId, lockOwner, cancellationToken);
 
-    [Obsolete("This API is currently not stable as it is in the Alpha stage. This attribute will be removed once it is stable.")]
-    public override Task<WorkflowReference> StartWorkflowAsync(string instanceId, string workflowComponent, string workflowName, object input, IReadOnlyDictionary<string, string>? workflowOptions = null, CancellationToken cancellationToken = new()) =>
-        _client.StartWorkflowAsync(instanceId, workflowComponent, workflowName, input, workflowOptions, cancellationToken);
+    [Obsolete("Obsolete")]
+    public override async Task<StartWorkflowResponse> StartWorkflowAsync(string workflowComponent, string workflowName, string instanceId = null, object input = null,
+        IReadOnlyDictionary<string, string> workflowOptions = null, CancellationToken cancellationToken = new CancellationToken()) =>
+        await _client.StartWorkflowAsync(workflowComponent, workflowName, instanceId, input, workflowOptions, cancellationToken);
 
-    [Obsolete("This API is currently not stable as it is in the Alpha stage. This attribute will be removed once it is stable.")]
-    public override Task<GetWorkflowResponse> GetWorkflowAsync(string instanceId, string workflowComponent, string workflowName, CancellationToken cancellationToken = new()) =>
-        _client.GetWorkflowAsync(instanceId, workflowComponent, workflowName, cancellationToken);
+    [Obsolete("Obsolete")]
+    public override async Task<GetWorkflowResponse> GetWorkflowAsync(string instanceId, string workflowComponent,
+        CancellationToken cancellationToken = new CancellationToken()) =>
+        await _client.GetWorkflowAsync(instanceId, workflowComponent, cancellationToken);
 
     [Obsolete("This API is currently not stable as it is in the Alpha stage. This attribute will be removed once it is stable.")]
     public override Task TerminateWorkflowAsync(string instanceId, string workflowComponent, CancellationToken cancellationToken = new()) =>
         _client.TerminateWorkflowAsync(instanceId, workflowComponent, cancellationToken);
+
+    public override async Task RaiseWorkflowEventAsync(string instanceId, string workflowComponent, string eventName, object eventData = null,
+        CancellationToken cancellationToken = new CancellationToken()) =>
+        await _client.RaiseWorkflowEventAsync(instanceId, workflowComponent, eventName, eventData, cancellationToken);
+
+    [Obsolete("Obsolete")]
+    public override async Task PauseWorkflowAsync(string instanceId, string workflowComponent,
+        CancellationToken cancellationToken = new CancellationToken()) =>
+        await _client.PauseWorkflowAsync(instanceId, workflowComponent, cancellationToken);
+
+    [Obsolete("Obsolete")]
+    public override async Task ResumeWorkflowAsync(string instanceId, string workflowComponent,
+        CancellationToken cancellationToken = new CancellationToken()) =>
+        await _client.ResumeWorkflowAsync(instanceId, workflowComponent, cancellationToken);
+
+    [Obsolete("Obsolete")]
+    public override async Task PurgeWorkflowAsync(string instanceId, string workflowComponent,
+        CancellationToken cancellationToken = new CancellationToken()) =>
+        await _client.PurgeWorkflowAsync(instanceId, workflowComponent, cancellationToken).ConfigureAwait(false);
 
     public override JsonSerializerOptions JsonSerializerOptions => 
         _client.JsonSerializerOptions;
