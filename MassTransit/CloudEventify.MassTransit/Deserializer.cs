@@ -83,6 +83,9 @@ public class Deserializer : IMessageDeserializer
         bool SerializerContext.IsSupportedMessageType<T>() => 
             true;
 
+        public bool IsSupportedMessageType(Type messageType) => 
+            true;
+
         bool SerializerContext.TryGetMessage<T>(out T? message) where T : class
         {
             try

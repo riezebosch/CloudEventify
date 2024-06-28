@@ -254,7 +254,7 @@ public class DeserializerTests
         var host = new InMemoryHostConfiguration(bus, new Uri("loopback://localhost"), topology);
 
         return new InMemoryReceiveContext(
-            new InMemoryTransportMessage(Guid.Empty, message.ToArray(), "application/cloudevents+json", "my-custom-message"),
+            new InMemoryTransportMessage(Guid.Empty, message.ToArray(), "application/cloudevents+json"),
             new TransportInMemoryReceiveEndpointContext(host, new InMemoryReceiveEndpointConfiguration(host, "no-queue", bus)));
     }
 }
