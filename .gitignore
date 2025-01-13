@@ -10,3 +10,4 @@ StrykerOutput/
 reports/
 .vs
 coverage.*.xml
+.learningtransport/
