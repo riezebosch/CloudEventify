@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using FluentAssertions;
 using FluentAssertions.Extensions;
 using Hypothesist;
 using Hypothesist.Rebus;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Rebus.Activation;
 using Rebus.Bus;
 using Rebus.Config;
+using Rebus.Messages;
 using Rebus.Messages.Control;
 using Rebus.Persistence.InMem;
 using Rebus.Routing.TypeBased;
@@ -111,6 +113,45 @@ public class SerializerTests
         
         // Assert
         await hypothesis.Validate(2.Seconds());
+    }
+
+    [Theory]
+    [InlineData("producer")]
+    [InlineData("urn:example:producer")]
+    [InlineData("https://example.com/producer")]
+    public async Task SenderAddressBecomesSource(string address)
+    {
+        // Arrange
+        var network = new InMemNetwork();
+        var received = new TaskCompletionSource<string>();
+
+        using var activator = new BuiltinHandlerActivator()
+            .Handle<A.UserLoggedIn>((_, context, _) =>
+            {
+                received.TrySetResult(context.Headers[Headers.SenderAddress]);
+                return Task.CompletedTask;
+            });
+        using var consumer = Configure
+            .With(activator)
+            .Transport(s => s.UseInMemoryTransport(network, "consumer"))
+            .Serialization(s => s.UseCloudEvents()
+                .AddWithCustomName<A.UserLoggedIn>("user.loggedIn"))
+            .Start();
+
+        using var producer = Configure
+            .OneWayClient()
+            .Transport(s => s.UseInMemoryTransportAsOneWayClient(network))
+            .Routing(r => r.TypeBased().Map<A.UserLoggedIn>("consumer"))
+            .Serialization(s => s.UseCloudEvents()
+                .AddWithCustomName<A.UserLoggedIn>("user.loggedIn"))
+            .Options(o => o.UseSenderAddress(address))
+            .Start();
+
+        // Act
+        await producer.Send(new A.UserLoggedIn(1234));
+
+        // Assert
+        (await received.Task.WaitAsync(2.Seconds())).Should().Be(address);
     }
 
     private static IBus Producer(IHandlerActivator activator, InMemNetwork network) =>

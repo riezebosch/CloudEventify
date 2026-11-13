@@ -38,13 +38,24 @@ internal class Serializer : ISerializer
             Id = message.GetMessageId(),
             Subject = message.GetMessageLabel(),
             Source = message.Headers.TryGetValue(Headers.SenderAddress, out var source)
-                ? new Uri(source, UriKind.Relative)
+                ? ToSource(source)
                 : new Uri("cloudeventify:rebus"),
             Data = message.Body,
             Time = DateTimeOffset.Parse(message.Headers[Headers.SentTime]),
             Type = message.Headers[Headers.Type],
             [TraceParentExtensionAttribute] = message.Headers[Headers.CorrelationId]
         };
+
+    /// <summary>
+    /// A sender address is usually a queue name, which is a relative URI reference.
+    /// An address set with UseSenderAddress may also be an absolute URI, such as a URN.
+    /// The CloudEvents spec recommends an absolute URI for the source attribute.
+    /// Every address that parses as relative is still read as relative.
+    /// </summary>
+    private static Uri ToSource(string address) =>
+        Uri.TryCreate(address, UriKind.Relative, out var relative)
+            ? relative
+            : new Uri(address, UriKind.Absolute);
 
     private static void UpdateTransportHeaders(TransportMessage transportMessage, CloudEvent cloudEvent)
     {

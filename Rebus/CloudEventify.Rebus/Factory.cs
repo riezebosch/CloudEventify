@@ -51,6 +51,7 @@ public static class Factory
     /// </summary>
     /// <remarks>
     /// The rbs2-sender-address header (used to set the Source attribute) is only added when not already available.
+    /// The address can be relative (a queue name) or an absolute URI such as <c>urn:example:my-service</c>.
     /// </remarks>
     public static OptionsConfigurer UseSenderAddress(this OptionsConfigurer options, string address)
     {
